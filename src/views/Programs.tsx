@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ExercisePicker } from '../components/ExercisePicker';
+import { PlanPicker, fmtClock, repsLabel } from '../components/PlanPicker';
+import { ValueButton } from '../components/Wheel';
 import { Icon } from '../components/Icon';
 import { Modal, confirmAction } from '../components/Modal';
 import { MUSCLE_LABELS } from '../data/exercises';
@@ -8,7 +10,7 @@ import { ExerciseFigure } from '../illustrations/ExerciseFigure';
 import { href, navigate } from '../router';
 import { remove, upsert, useProfileStore } from '../store';
 import type { Program, ProgramDay } from '../types';
-import { diffProgram, fmtDate, fmtRelative, nextProgramDay, nowIso, uid } from '../utils';
+import { diffProgram, fmtDate, fmtNum, fmtRelative, lastSets, nextProgramDay, nowIso, uid } from '../utils';
 import { startWorkout } from '../workoutActions';
 
 export function useStartWorkout() {
@@ -140,6 +142,7 @@ export function ProgramEditor({ id }: { id: string }) {
   const [draft, setDraft] = useState<Program | undefined>(saved);
   const [picking, setPicking] = useState<{ dayId: string; replace?: string } | null>(null);
   const [showHistory, setShowHistory] = useState(false);
+  const [tuning, setTuning] = useState<{ dayId: string; peId: string; field: string; anchor: HTMLElement } | null>(null);
   const start = useStartWorkout();
 
   // Reset the draft only when navigating to another program, not on every save.
@@ -262,11 +265,6 @@ export function ProgramEditor({ id }: { id: string }) {
           <ol className="plan-list">
             {day.exercises.map((pe, i) => {
               const ex = exerciseById(pe.exerciseId);
-              const set = (patch: Partial<typeof pe>) =>
-                setDay(day.id, (d) => ({
-                  ...d,
-                  exercises: d.exercises.map((x) => (x.id === pe.id ? { ...x, ...patch } : x)),
-                }));
               return (
                 <li key={pe.id} className="plan-row">
                   <a className="plan-fig" href={href(`/oevelser/${pe.exerciseId}`)} aria-label={`Se ${ex?.name}`}>
@@ -278,42 +276,24 @@ export function ProgramEditor({ id }: { id: string }) {
                       <span className="muted small">{ex && MUSCLE_LABELS[ex.primary]}</span>
                     </div>
                     <div className="plan-fields">
-                      <label>
-                        <span>Sæt</span>
-                        <input
-                          inputMode="numeric"
-                          value={pe.sets}
-                          onChange={(e) => set({ sets: Math.max(1, Math.min(20, Number(e.target.value.replace(/\D/g, '')) || 1)) })}
-                        />
-                      </label>
-                      <label>
-                        <span>{ex?.timed ? 'Tid' : 'Reps'}</span>
-                        <input value={pe.reps} onChange={(e) => set({ reps: e.target.value })} />
-                      </label>
-                      {!ex?.timed && (
-                        <label>
-                          <span>Kg</span>
-                          <input
-                            inputMode="decimal"
-                            placeholder="–"
-                            value={pe.weight ?? ''}
-                            onChange={(e) => {
-                              const v = e.target.value.replace(',', '.');
-                              set({ weight: v === '' || isNaN(Number(v)) ? undefined : Number(v) });
-                            }}
+                      {(
+                        [
+                          ['Sæt', String(pe.sets)],
+                          [ex?.timed ? 'Tid' : 'Reps', repsLabel(pe.reps, ex?.timed)],
+                          ...(ex?.timed ? [] : [['Kg', pe.weight != null ? fmtNum(pe.weight, 2) : null]]),
+                          ['Pause', fmtClock(pe.restSec ?? 90)],
+                        ] as [string, string | null][]
+                      ).map(([label, value]) => (
+                        <label key={label}>
+                          <span>{label}</span>
+                          <ValueButton
+                            label={label}
+                            value={value}
+                            active={tuning?.peId === pe.id && tuning.field === label}
+                            onClick={(anchor) => setTuning({ dayId: day.id, peId: pe.id, field: label, anchor })}
                           />
                         </label>
-                      )}
-                      <label>
-                        <span>Pause</span>
-                        <select value={pe.restSec ?? 90} onChange={(e) => set({ restSec: Number(e.target.value) })}>
-                          {[30, 45, 60, 90, 120, 180, 240].map((s) => (
-                            <option key={s} value={s}>
-                              {s < 60 ? `${s} s` : `${s / 60} min`}
-                            </option>
-                          ))}
-                        </select>
-                      </label>
+                      ))}
                     </div>
                   </div>
                   <div className="plan-tools">
@@ -431,6 +411,31 @@ export function ProgramEditor({ id }: { id: string }) {
           }}
         />
       )}
+
+      {tuning &&
+        (() => {
+          const day = draft.days.find((d) => d.id === tuning.dayId);
+          const pe = day?.exercises.find((x) => x.id === tuning.peId);
+          if (!day || !pe) return null;
+          const ex = exerciseById(pe.exerciseId);
+          const last = lastSets(workouts, pe.exerciseId);
+          return (
+            <PlanPicker
+              anchor={tuning.anchor}
+              title={ex?.name ?? 'Øvelse'}
+              planned={pe}
+              timed={ex?.timed}
+              fallbackWeight={last?.[0]?.weight ?? 20}
+              onClose={() => setTuning(null)}
+              onChange={(patch) =>
+                setDay(day.id, (d) => ({
+                  ...d,
+                  exercises: d.exercises.map((x) => (x.id === pe.id ? { ...x, ...patch } : x)),
+                }))
+              }
+            />
+          );
+        })()}
 
       {showHistory && (
         <Modal title="Ændringshistorik" onClose={() => setShowHistory(false)}>

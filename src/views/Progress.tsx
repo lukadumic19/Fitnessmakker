@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Icon } from '../components/Icon';
 import { LineChart } from '../components/LineChart';
+import { NumberWheel } from '../components/Wheel';
 import { Modal, confirmAction } from '../components/Modal';
 import { ExerciseFigure } from '../illustrations/ExerciseFigure';
 import { href } from '../router';
@@ -8,13 +9,16 @@ import { remove, upsert, useProfileStore } from '../store';
 import type { BodyEntry } from '../types';
 import { exerciseHistory, fmtDate, fmtNum, todayIso, uid } from '../utils';
 
+const TENTHS = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9];
+const HALVES = [0, 0.5];
+
 const METRICS = [
-  { key: 'weight', label: 'Vægt', unit: 'kg' },
-  { key: 'bodyFat', label: 'Fedtprocent', unit: '%' },
-  { key: 'waist', label: 'Talje', unit: 'cm' },
-  { key: 'chest', label: 'Bryst', unit: 'cm' },
-  { key: 'arm', label: 'Overarm', unit: 'cm' },
-  { key: 'thigh', label: 'Lår', unit: 'cm' },
+  { key: 'weight', label: 'Vægt', unit: 'kg', min: 30, max: 250, fractions: TENTHS, fallback: 80 },
+  { key: 'bodyFat', label: 'Fedtprocent', unit: '%', min: 3, max: 60, fractions: TENTHS, fallback: 20 },
+  { key: 'waist', label: 'Talje', unit: 'cm', min: 40, max: 200, fractions: HALVES, fallback: 85 },
+  { key: 'chest', label: 'Bryst', unit: 'cm', min: 50, max: 200, fractions: HALVES, fallback: 100 },
+  { key: 'arm', label: 'Overarm', unit: 'cm', min: 15, max: 70, fractions: HALVES, fallback: 35 },
+  { key: 'thigh', label: 'Lår', unit: 'cm', min: 30, max: 100, fractions: HALVES, fallback: 55 },
 ] as const;
 
 type MetricKey = (typeof METRICS)[number]['key'];
@@ -147,6 +151,7 @@ function Body() {
         <BodyForm
           entry={editing}
           isNew={!body.some((b) => b.id === editing.id)}
+          history={body}
           onClose={() => setEditing(null)}
           onSave={(e) => {
             update(upsert('body', e));
@@ -167,25 +172,28 @@ function Body() {
 function BodyForm({
   entry,
   isNew,
+  history,
   onClose,
   onSave,
   onDelete,
 }: {
   entry: BodyEntry;
   isNew: boolean;
+  history: BodyEntry[];
   onClose: () => void;
   onSave: (e: BodyEntry) => void;
   onDelete: () => void;
 }) {
-  const [vals, setVals] = useState<Record<string, string>>(() =>
-    Object.fromEntries(METRICS.map((m) => [m.key, entry[m.key]?.toString().replace('.', ',') ?? ''])),
+  const [vals, setVals] = useState<Record<MetricKey, number | null>>(
+    () => Object.fromEntries(METRICS.map((m) => [m.key, entry[m.key] ?? null])) as Record<MetricKey, number | null>,
   );
   const [date, setDate] = useState(entry.date);
   const [note, setNote] = useState(entry.note ?? '');
-  const parse = (v: string) => {
-    const n = Number(v.replace(',', '.'));
-    return v.trim() && !isNaN(n) ? n : undefined;
-  };
+  // Wheels start at the latest earlier value, so small changes are a short scroll.
+  const lastValue = (k: MetricKey) =>
+    [...history].reverse().find((b) => b.id !== entry.id && b.date <= date && b[k] != null)?.[k] ?? null;
+  const nothing = METRICS.every((m) => vals[m.key] == null);
+
   return (
     <Modal title={isNew ? 'Ny måling' : 'Rediger måling'} onClose={onClose}>
       <form
@@ -193,32 +201,34 @@ function BodyForm({
         onSubmit={(e) => {
           e.preventDefault();
           const next: BodyEntry = { id: entry.id, profileId: entry.profileId, date, note: note.trim() || undefined };
-          for (const m of METRICS) next[m.key] = parse(vals[m.key]);
+          for (const m of METRICS) next[m.key] = vals[m.key] ?? undefined;
           onSave(next);
         }}
       >
         <label className="field">
           <span>Dato</span>
-          <input type="date" value={date} onChange={(e) => setDate(e.target.value)} required />
+          <input id="body-date" type="date" value={date} onChange={(e) => setDate(e.target.value)} required />
         </label>
-        <div className="field-grid">
+        <p className="muted small">Scroll på hjulene for de mål, du vil registrere. Mål uden værdi gemmes ikke.</p>
+        <div className="field-grid wheel-compact">
           {METRICS.map((m) => (
-            <label key={m.key} className="field">
-              <span>
-                {m.label} ({m.unit})
-              </span>
-              <input
-                inputMode="decimal"
-                value={vals[m.key]}
-                onChange={(e) => setVals({ ...vals, [m.key]: e.target.value })}
-                autoFocus={m.key === 'weight'}
-              />
-            </label>
+            <NumberWheel
+              key={m.key}
+              label={m.label}
+              unit={m.unit}
+              value={vals[m.key]}
+              onChange={(v) => setVals((x) => ({ ...x, [m.key]: v }))}
+              min={m.min}
+              max={m.max}
+              fractions={[...m.fractions]}
+              fallback={lastValue(m.key) ?? m.fallback}
+              optional
+            />
           ))}
         </div>
         <label className="field">
           <span>Note</span>
-          <input value={note} onChange={(e) => setNote(e.target.value)} placeholder="Fx efter ferie, ny kost …" />
+          <input id="body-note" value={note} onChange={(e) => setNote(e.target.value)} placeholder="Fx efter ferie, ny kost …" />
         </label>
         <div className="form-actions">
           {!isNew && (
@@ -230,7 +240,9 @@ function BodyForm({
           <button type="button" className="btn btn-ghost" onClick={onClose}>
             Annuller
           </button>
-          <button className="btn btn-primary">Gem</button>
+          <button className="btn btn-primary" disabled={nothing && !note.trim()}>
+            Gem
+          </button>
         </div>
       </form>
     </Modal>

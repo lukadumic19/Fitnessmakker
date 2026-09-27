@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Avatar } from '../components/Avatar';
+import { NumberWheel } from '../components/Wheel';
 import { Icon } from '../components/Icon';
 import { Modal } from '../components/Modal';
 import { upsert, useStore } from '../store';
@@ -22,7 +23,7 @@ export function ProfileForm({
   const [name, setName] = useState(initial?.name ?? '');
   const [color, setColor] = useState(initial?.color ?? PROFILE_COLORS[0]);
   const [goal, setGoal] = useState(initial?.goal ?? '');
-  const [height, setHeight] = useState(initial?.heightCm?.toString() ?? '');
+  const [height, setHeight] = useState<number | null>(initial?.heightCm ?? null);
 
   return (
     <form
@@ -36,7 +37,7 @@ export function ProfileForm({
           name: name.trim(),
           color,
           goal: goal.trim() || undefined,
-          heightCm: height ? Number(height) : undefined,
+          heightCm: height ?? undefined,
         });
       }}
     >
@@ -63,10 +64,9 @@ export function ProfileForm({
         <span>Mål (valgfrit)</span>
         <input value={goal} onChange={(e) => setGoal(e.target.value)} placeholder="Fx stærkere dødløft, 5 km under 25 min" />
       </label>
-      <label className="field">
-        <span>Højde i cm (valgfrit)</span>
-        <input inputMode="numeric" value={height} onChange={(e) => setHeight(e.target.value.replace(/[^\d]/g, ''))} />
-      </label>
+      <div className="field wheel-compact height-wheel">
+        <NumberWheel label="Højde (valgfrit)" unit="cm" value={height} onChange={setHeight} min={120} max={230} fallback={178} optional />
+      </div>
       <div className="form-actions">
         {onCancel && (
           <button type="button" className="btn btn-ghost" onClick={onCancel}>

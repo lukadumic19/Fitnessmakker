@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ExercisePicker } from '../components/ExercisePicker';
+import { NumberWheel, PickerSheet, ValueButton } from '../components/Wheel';
 import { Icon } from '../components/Icon';
 import { Modal, confirmAction } from '../components/Modal';
 import type { Exercise } from '../data/exercises';
@@ -198,11 +199,6 @@ function useNow(interval = 1000) {
   return now;
 }
 
-const parseNum = (v: string) => {
-  const n = Number(v.replace(',', '.'));
-  return v.trim() === '' || isNaN(n) ? null : n;
-};
-
 export function ActiveWorkout() {
   const { workouts, update, exerciseById, programs } = useProfileStore();
   const w = workouts.find((x) => !x.finishedAt);
@@ -210,6 +206,7 @@ export function ActiveWorkout() {
   const [picking, setPicking] = useState<null | { replace?: string }>(null);
   const [rest, setRest] = useState<{ end: number; total: number } | null>(null);
   const [info, setInfo] = useState<Exercise | null>(null);
+  const [editing, setEditing] = useState<{ entryId: string; setId: string; anchor: HTMLElement } | null>(null);
 
   if (!w) {
     return (
@@ -231,8 +228,14 @@ export function ActiveWorkout() {
     plannedDay?.exercises.find((e) => e.exerciseId === exerciseId)?.restSec ?? 90;
 
   const save = (next: Workout) => update(upsert('workouts', next));
+  // Functional update so quick successive edits (e.g. two wheels) never overwrite each other.
   const setEntry = (entryId: string, fn: (e: WorkoutEntry) => WorkoutEntry) =>
-    save({ ...w, entries: w.entries.map((e) => (e.id === entryId ? fn(e) : e)) });
+    update((d) => ({
+      ...d,
+      workouts: d.workouts.map((x) =>
+        x.id === w.id ? { ...x, entries: x.entries.map((e) => (e.id === entryId ? fn(e) : e)) } : x,
+      ),
+    }));
   const setSet = (entryId: string, setId: string, patch: Partial<SetLog>) =>
     setEntry(entryId, (e) => ({ ...e, sets: e.sets.map((s) => (s.id === setId ? { ...s, ...patch } : s)) }));
 
@@ -258,6 +261,40 @@ export function ActiveWorkout() {
       return;
     save({ ...w, entries, finishedAt: nowIso() });
     navigate(`/traening/${w.id}`);
+  };
+
+  /** Values to start from when a set has none yet: last time, then the set above. */
+  const suggest = (entry: WorkoutEntry, i: number) => {
+    const prev = lastSets(workouts, entry.exerciseId, w.id);
+    const above = entry.sets.slice(0, i).reverse().find((x) => x.weight != null || x.reps != null);
+    return {
+      weight: entry.sets[i].weight ?? above?.weight ?? prev?.[i]?.weight ?? prev?.[0]?.weight ?? 20,
+      reps: entry.sets[i].reps ?? above?.reps ?? prev?.[i]?.reps ?? prev?.[0]?.reps ?? (exerciseById(entry.exerciseId)?.timed ? 10 : 8),
+    };
+  };
+
+  const toggleDone = (entry: WorkoutEntry, s: SetLog) => {
+    const done = !s.done;
+    const patch: Partial<SetLog> = { done };
+    if (done) {
+      const sug = suggest(entry, entry.sets.indexOf(s));
+      if (s.reps == null) patch.reps = sug.reps;
+      if (s.weight == null && !exerciseById(entry.exerciseId)?.timed) patch.weight = sug.weight;
+    }
+    setSet(entry.id, s.id, patch);
+    if (done && !exerciseById(entry.exerciseId)?.timed) {
+      const total = restFor(entry.exerciseId);
+      setRest({ end: Date.now() + total * 1000, total });
+    }
+  };
+
+  const openSet = (entry: WorkoutEntry, s: SetLog, anchor: HTMLElement) => {
+    const i = entry.sets.indexOf(s);
+    const sug = suggest(entry, i);
+    const timed = exerciseById(entry.exerciseId)?.timed;
+    if (s.reps == null || (s.weight == null && !timed))
+      setSet(entry.id, s.id, { reps: s.reps ?? sug.reps, weight: timed ? s.weight : (s.weight ?? sug.weight) });
+    setEditing({ entryId: entry.id, setId: s.id, anchor });
   };
 
   const restLeft = rest ? Math.max(0, Math.ceil((rest.end - now) / 1000)) : 0;
@@ -362,37 +399,26 @@ export function ActiveWorkout() {
                       {p ? (timed ? `${p.reps} min` : `${fmtNum(p.weight ?? 0)} × ${p.reps}`) : '–'}
                     </span>
                     {!timed && (
-                      <input
-                        inputMode="decimal"
-                        aria-label="Vægt i kg"
-                        placeholder={p?.weight != null ? String(p.weight) : '0'}
-                        value={s.weight ?? ''}
-                        onChange={(e) => setSet(entry.id, s.id, { weight: parseNum(e.target.value) })}
+                      <ValueButton
+                        label="Vægt i kg"
+                        value={s.weight != null ? fmtNum(s.weight, 2) : null}
+                        placeholder={p?.weight != null ? fmtNum(p.weight, 2) : '–'}
+                        active={editing?.setId === s.id}
+                        onClick={(el) => openSet(entry, s, el)}
                       />
                     )}
-                    <input
-                      inputMode="numeric"
-                      aria-label={timed ? 'Minutter' : 'Gentagelser'}
-                      placeholder={p?.reps != null ? String(p.reps) : '0'}
-                      value={s.reps ?? ''}
-                      onChange={(e) => setSet(entry.id, s.id, { reps: parseNum(e.target.value) })}
+                    <ValueButton
+                      label={timed ? 'Minutter' : 'Gentagelser'}
+                      value={s.reps != null ? String(s.reps) : null}
+                      placeholder={p?.reps != null ? String(p.reps) : '–'}
+                      active={editing?.setId === s.id}
+                      onClick={(el) => openSet(entry, s, el)}
                     />
                     <button
                       className={`check ${s.done ? 'is-on' : ''}`}
                       aria-label={s.done ? 'Markér som ikke udført' : 'Markér som udført'}
                       aria-pressed={s.done}
-                      onClick={() => {
-                        const done = !s.done;
-                        // Fill from placeholder (previous) values when ticking an empty set.
-                        const patch: Partial<SetLog> = { done };
-                        if (done && s.reps == null && p?.reps != null) patch.reps = p.reps;
-                        if (done && s.weight == null && p?.weight != null) patch.weight = p.weight;
-                        setSet(entry.id, s.id, patch);
-                        if (done && !timed) {
-                          const total = restFor(entry.exerciseId);
-                          setRest({ end: Date.now() + total * 1000, total });
-                        }
-                      }}
+                      onClick={() => toggleDone(entry, s)}
                     >
                       <Icon name="check" size={18} />
                     </button>
@@ -460,6 +486,63 @@ export function ActiveWorkout() {
       )}
 
       {info && <ExerciseInfo exercise={info} onClose={() => setInfo(null)} />}
+
+      {editing &&
+        (() => {
+          const entry = w.entries.find((e) => e.id === editing.entryId);
+          const s = entry?.sets.find((x) => x.id === editing.setId);
+          if (!entry || !s) return null;
+          const ex = exerciseById(entry.exerciseId);
+          const i = entry.sets.indexOf(s);
+          const p = lastSets(workouts, entry.exerciseId, w.id)?.[i];
+          const next = entry.sets.slice(i + 1).find((x) => !x.done);
+          return (
+            <PickerSheet
+              anchor={editing.anchor}
+              title={`Sæt ${i + 1} · ${ex?.name ?? ''}`}
+              subtitle={p ? `Sidst: ${ex?.timed ? `${p.reps} min` : `${fmtNum(p.weight ?? 0)} kg × ${p.reps}`}` : undefined}
+              onClose={() => setEditing(null)}
+              footer={
+                <>
+                  <button className="btn btn-ghost" onClick={() => setEditing(null)}>
+                    Luk
+                  </button>
+                  <button
+                    className="btn btn-primary"
+                    onClick={() => {
+                      if (!s.done) toggleDone(entry, s);
+                      if (next) openSet(entry, next, editing.anchor);
+                      else setEditing(null);
+                    }}
+                  >
+                    <Icon name="check" size={16} />
+                    {s.done ? (next ? 'Næste sæt' : 'Færdig') : next ? 'Udført · næste sæt' : 'Udført'}
+                  </button>
+                </>
+              }
+            >
+              <div className="picker-row">
+                {!ex?.timed && (
+                  <NumberWheel
+                    label="Kg"
+                    value={s.weight}
+                    onChange={(v) => setSet(entry.id, s.id, { weight: v })}
+                    min={0}
+                    max={400}
+                    fractions={[0, 0.25, 0.5, 0.75]}
+                  />
+                )}
+                <NumberWheel
+                  label={ex?.timed ? 'Minutter' : 'Reps'}
+                  value={s.reps}
+                  onChange={(v) => setSet(entry.id, s.id, { reps: v })}
+                  min={ex?.timed ? 1 : 0}
+                  max={ex?.timed ? 300 : 100}
+                />
+              </div>
+            </PickerSheet>
+          );
+        })()}
     </div>
   );
 }
