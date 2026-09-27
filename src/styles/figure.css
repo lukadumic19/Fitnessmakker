@@ -1,0 +1,30 @@
+.exercise-figure {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.exercise-figure line,
+.exercise-figure polygon {
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.fig-floor { stroke: var(--fig-floor); stroke-width: 1.5; }
+.fig-body { stroke: var(--fig); }
+.fig-far { stroke: var(--fig-far); }
+.fig-hl { stroke: var(--accent); }
+.fig-far.fig-hl { stroke: var(--accent-soft); }
+.fig-head { fill: var(--fig); }
+.fig-torso-fill { fill: var(--fig); stroke: var(--fig); }
+.fig-torso-fill.fig-hl { fill: var(--accent); stroke: var(--accent); }
+.fig-plate { fill: var(--equip-fill); stroke: var(--equip); stroke-width: 2.5; }
+.fig-plate-hub { fill: var(--equip); }
+.fig-db { fill: var(--equip); }
+.fig-db-bar { stroke: var(--equip); }
+.fig-db-end { stroke: var(--equip); }
+.fig-cable { stroke: var(--equip); stroke-dasharray: none; }
+.fig-pulley { fill: var(--equip); }
+.fig-equip { stroke: var(--equip-soft); }
+.fig-equip-fill { fill: var(--equip-soft); stroke: var(--equip-soft); }
+.fig-equip-ring { fill: none; stroke: var(--equip-soft); stroke-width: 4; }
+.fig-equip-solid { fill: var(--equip); }
