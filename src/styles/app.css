@@ -971,3 +971,7 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--a
 .is-sheet .picker-row.is-dense > * { flex: 1 1 0; min-width: 0; }
 .is-sheet .picker-row.is-dense > .picker-col:has(.num-wheel-row), .is-sheet .picker-row.is-dense > .num-wheel { flex-grow: 2; }
 .picker-col > .num-wheel-label { min-height: 20px; display: flex; align-items: center; }
+.filter-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.filter-row .search { flex: 1 1 240px; max-width: 380px; }
+.equip-select { width: auto; flex: 0 0 auto; }
+.chip-count { font-size: 11px; opacity: 0.6; margin-left: 2px; font-variant-numeric: tabular-nums; }

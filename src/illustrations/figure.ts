@@ -30,6 +30,9 @@ export interface Pose {
   footF?: number;
   /** Translate the whole figure so the given joint lands at `at`. */
   anchor?: { joint: JointName; at: P };
+  /** Override segment lengths, e.g. to lift the shoulders in a shrug. */
+  torsoLen?: number;
+  neckLen?: number;
 }
 
 export type JointName =
@@ -46,7 +49,9 @@ export type JointName =
   | 'toeN'
   | 'kneeF'
   | 'ankleF'
-  | 'toeF';
+  | 'toeF'
+  /** Upper back, just behind the shoulders – where a back-squat bar rests. */
+  | 'back';
 
 export type Joints = Record<JointName, P>;
 
@@ -62,6 +67,8 @@ export type Prop =
   /** Short bar relative to a joint, e.g. a foot plate that moves with the feet. */
   | { kind: 'attached'; at: string; from: P; to: P; w?: number }
   | { kind: 'line'; from: P; to: P; w?: number }
+  /** Front view: barbell through both hands with plates at the ends. */
+  | { kind: 'barbellFront'; ext?: number }
   | { kind: 'rect'; x: number; y: number; w: number; h: number; r?: number }
   | { kind: 'circle'; at: P; r: number; fill?: boolean };
 
@@ -108,10 +115,11 @@ const FAR_OFFSET: P = [-4, -2];
 
 export function solvePose(pose: Pose): Joints {
   const hip = pose.hip;
-  const shoulder = add(hip, mul(dir(pose.torso), LEN.torso));
+  const shoulder = add(hip, mul(dir(pose.torso), pose.torsoLen ?? LEN.torso));
   const headDir = dir(pose.torso + (pose.head ?? 0));
-  const neck = add(shoulder, mul(headDir, LEN.neck));
-  const head = add(shoulder, mul(headDir, LEN.neck + LEN.head));
+  const neckLen = pose.neckLen ?? LEN.neck;
+  const neck = add(shoulder, mul(headDir, neckLen));
+  const head = add(shoulder, mul(headDir, neckLen + LEN.head));
 
   const [elbowN, handN] = solveLimb(shoulder, pose.armN, LEN.upperArm, LEN.forearm);
   const [kneeN, ankleN] = solveLimb(hip, pose.legN, LEN.thigh, LEN.shin);
@@ -132,7 +140,10 @@ export function solvePose(pose: Pose): Joints {
   const toeN = add(ankleN, mul(dir(pose.footN ?? 90), LEN.foot));
   const toeF = add(ankleF, mul(dir(pose.footF ?? pose.footN ?? 90), LEN.foot));
 
+  const tu = dir(pose.torso);
+  const back = add(add(shoulder, mul([tu[1], -tu[0]], 7)), mul(tu, -4));
   const joints: Joints = {
+    back,
     hip,
     shoulder,
     neck,
@@ -170,6 +181,14 @@ export interface FrontPose {
   hip: P;
   arms: [number, number];
   legs: [number, number];
+  /** Left-side overrides (screen left). Angles here are NOT mirrored. */
+  armsL?: Limb;
+  legsL?: Limb;
+  /** Right-side leg as an absolute target, e.g. for a side lunge. */
+  legsR?: Limb;
+  /** Rotate the whole figure (degrees, clockwise) around `pivot`. */
+  tilt?: number;
+  pivot?: P;
 }
 
 export const FRONT = { shoulderHalf: 15, hipHalf: 9 };
@@ -204,16 +223,27 @@ export function solveFront(pose: FrontPose): FrontJoints {
   const [elbowR, handR] = solveLimb(shR, pose.arms, LEN.upperArm, LEN.forearm);
   const [elbowL, handL] = solveLimb(
     shL,
-    [mirror(pose.arms[0]), mirror(pose.arms[1])],
+    pose.armsL ?? [mirror(pose.arms[0]), mirror(pose.arms[1])],
     LEN.upperArm,
     LEN.forearm,
   );
-  const [kneeR, ankleR] = solveLimb(hipR, pose.legs, LEN.thigh, LEN.shin);
+  const [kneeR, ankleR] = solveLimb(hipR, pose.legsR ?? pose.legs, LEN.thigh, LEN.shin);
   const [kneeL, ankleL] = solveLimb(
     hipL,
-    [mirror(pose.legs[0]), mirror(pose.legs[1])],
+    pose.legsL ?? [mirror(pose.legs[0]), mirror(pose.legs[1])],
     LEN.thigh,
     LEN.shin,
   );
-  return { hipL, hipR, shL, shR, head, elbowL, handL, elbowR, handR, kneeL, ankleL, kneeR, ankleR };
+  const j: FrontJoints = { hipL, hipR, shL, shR, head, elbowL, handL, elbowR, handR, kneeL, ankleL, kneeR, ankleR };
+  if (pose.tilt) {
+    const c = pose.pivot ?? [(ankleL[0] + ankleR[0]) / 2, (ankleL[1] + ankleR[1]) / 2];
+    const r = rad(pose.tilt);
+    const cos = Math.cos(r);
+    const sin = Math.sin(r);
+    for (const k of Object.keys(j) as (keyof FrontJoints)[]) {
+      const [x, y] = sub(j[k], c);
+      j[k] = [c[0] + x * cos - y * sin, c[1] + x * sin + y * cos];
+    }
+  }
+  return j;
 }

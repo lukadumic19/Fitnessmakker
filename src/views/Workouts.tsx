@@ -3,7 +3,8 @@ import { ExercisePicker } from '../components/ExercisePicker';
 import { NumberWheel, PickerSheet, ValueButton } from '../components/Wheel';
 import { Icon } from '../components/Icon';
 import { Modal, confirmAction } from '../components/Modal';
-import type { Exercise } from '../data/exercises';
+import { exerciseMuscles, type Exercise } from '../data/exercises';
+import { MuscleMap } from '../illustrations/MuscleMap';
 import { ExerciseFigure } from '../illustrations/ExerciseFigure';
 import { href, navigate } from '../router';
 import { remove, upsert, useProfileStore } from '../store';
@@ -554,6 +555,7 @@ function ExerciseInfo({ exercise, onClose }: { exercise: Exercise; onClose: () =
         <ExerciseFigure illustration={exercise.illustration} animate />
       </div>
       <p>{exercise.description}</p>
+      <MuscleMap {...exerciseMuscles(exercise)} />
       {exercise.cues.length > 0 && (
         <ol className="cues">
           {exercise.cues.map((c) => (

@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
-import { EQUIPMENT_LABELS, MUSCLE_LABELS, type Exercise } from '../data/exercises';
+import { EQUIPMENT_LABELS, MUSCLE_LABELS, exerciseMuscles, type Exercise } from '../data/exercises';
+import { MUSCLE_NAMES } from '../data/muscles';
 import { ExerciseFigure } from '../illustrations/ExerciseFigure';
 import { useStore } from '../store';
 import { Icon } from './Icon';
@@ -49,20 +50,40 @@ export function ExerciseCard({
 export function useExerciseFilter(list: Exercise[]) {
   const [q, setQ] = useState('');
   const [muscle, setMuscle] = useState<string>('alle');
+  const [equipment, setEquipment] = useState<string>('alt');
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
+    const matches = (e: Exercise) => {
+      if (!needle) return true;
+      const m = exerciseMuscles(e);
+      return [e.name, MUSCLE_LABELS[e.primary], EQUIPMENT_LABELS[e.equipment], ...[...m.primary, ...m.secondary].map((x) => MUSCLE_NAMES[x])]
+        .some((t) => t.toLowerCase().includes(needle));
+    };
     return list.filter(
-      (e) =>
-        (muscle === 'alle' || e.primary === muscle) &&
-        (!needle || e.name.toLowerCase().includes(needle) || MUSCLE_LABELS[e.primary].toLowerCase().includes(needle)),
+      (e) => (muscle === 'alle' || e.primary === muscle) && (equipment === 'alt' || e.equipment === equipment) && matches(e),
     );
-  }, [list, q, muscle]);
+  }, [list, q, muscle, equipment]);
+  const counts = useMemo(() => {
+    const c: Record<string, number> = { alle: list.length };
+    for (const e of list) c[e.primary] = (c[e.primary] ?? 0) + 1;
+    return c;
+  }, [list]);
   const controls = (
     <div className="filters">
-      <label className="search">
-        <Icon name="search" size={18} />
-        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Søg efter øvelse" />
-      </label>
+      <div className="filter-row">
+        <label className="search">
+          <Icon name="search" size={18} />
+          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Søg efter øvelse eller muskel" aria-label="Søg" />
+        </label>
+        <select className="equip-select" value={equipment} onChange={(e) => setEquipment(e.target.value)} aria-label="Udstyr">
+          <option value="alt">Alt udstyr</option>
+          {Object.entries(EQUIPMENT_LABELS).map(([k, v]) => (
+            <option key={k} value={k}>
+              {v}
+            </option>
+          ))}
+        </select>
+      </div>
       <div className="chips" role="tablist">
         {['alle', ...Object.keys(MUSCLE_LABELS)].map((m) => (
           <button
@@ -72,7 +93,7 @@ export function useExerciseFilter(list: Exercise[]) {
             className={`chip ${muscle === m ? 'is-active' : ''}`}
             onClick={() => setMuscle(m)}
           >
-            {m === 'alle' ? 'Alle' : MUSCLE_LABELS[m]}
+            {m === 'alle' ? 'Alle' : MUSCLE_LABELS[m]} <span className="chip-count">{counts[m] ?? 0}</span>
           </button>
         ))}
       </div>

@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { EQUIPMENT_LABELS, EXERCISES, MUSCLE_LABELS, type Exercise } from '../data/exercises';
+import { EQUIPMENT_LABELS, EXERCISES, MUSCLE_LABELS, exerciseMuscles, type Exercise } from '../data/exercises';
+import { MuscleMap } from '../illustrations/MuscleMap';
 import { ExerciseCard, useExerciseFilter } from '../components/ExercisePicker';
 import { Icon } from '../components/Icon';
 import { LineChart } from '../components/LineChart';
@@ -63,6 +64,8 @@ export function ExerciseDetail({ exercise, onClose }: { exercise: Exercise; onCl
             <span className="tag tag-outline">{EQUIPMENT_LABELS[exercise.equipment]}</span>
           </div>
           <p>{exercise.description}</p>
+          <h3 className="h-small">Muskler</h3>
+          <MuscleMap {...exerciseMuscles(exercise)} />
           {exercise.cues.length > 0 && (
             <>
               <h3 className="h-small">Teknik</h3>
