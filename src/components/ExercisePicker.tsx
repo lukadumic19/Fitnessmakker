@@ -1,7 +1,8 @@
+import { MuscleTags } from './MuscleTags';
+import { ExerciseImage } from '../illustrations/ExerciseImage';
 import { useMemo, useState } from 'react';
 import { EQUIPMENT_LABELS, MUSCLE_LABELS, exerciseMuscles, type Exercise } from '../data/exercises';
 import { MUSCLE_NAMES } from '../data/muscles';
-import { ExerciseFigure } from '../illustrations/ExerciseFigure';
 import { useStore } from '../store';
 import { Icon } from './Icon';
 import { Modal } from './Modal';
@@ -28,7 +29,7 @@ export function ExerciseCard({
       onBlur={() => setHover(false)}
     >
       <div className="ex-card-fig">
-        <ExerciseFigure illustration={exercise.illustration} animate={hover} title={exercise.name} />
+        <ExerciseImage exercise={exercise} animate={hover} />
         {selected && (
           <span className="ex-card-check">
             <Icon name="check" size={16} />
@@ -37,8 +38,9 @@ export function ExerciseCard({
       </div>
       <div className="ex-card-body">
         <strong>{exercise.name}</strong>
+        <MuscleTags exercise={exercise} max={2} />
         <span className="muted small">
-          {MUSCLE_LABELS[exercise.primary]} · {EQUIPMENT_LABELS[exercise.equipment]}
+          {EQUIPMENT_LABELS[exercise.equipment]}
           {exercise.custom ? ' · Egen' : ''}
         </span>
         {meta}

@@ -43,6 +43,18 @@ export const MUSCLE_NAMES: Record<Muscle, string> = {
   lægge: 'Lægge',
 };
 
+/** Short names for labels on the illustrations. */
+export const MUSCLE_SHORT: Record<Muscle, string> = {
+  ...MUSCLE_NAMES,
+  lats: 'Latissimus',
+  'forreste-skulder': 'Forreste skulder',
+  'side-skulder': 'Sideskulder',
+  'bagerste-skulder': 'Bagerste skulder',
+  mave: 'Mavemuskler',
+  'skrå-mave': 'Skrå mave',
+  hofteabduktorer: 'Hofte (yderside)',
+};
+
 /** Default muscles for an exercise that only has a muscle group (e.g. custom ones). */
 export const GROUP_MUSCLES: Record<MuscleGroup, Muscle[]> = {
   bryst: ['bryst'],

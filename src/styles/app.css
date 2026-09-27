@@ -22,6 +22,23 @@
   --equip: #5d6166;
   --equip-fill: #ebe8e2;
   --equip-soft: #cfcbc3;
+  --skin-hi: #ece6dd;
+  --skin-lo: #c9bfb1;
+  --skin-line: #6f675c;
+  --skin-far: #b9b0a3;
+  --skin-far-line: #8f8678;
+  --skin-muscle: rgba(96, 74, 52, 0.13);
+  --hair: #3d342d;
+  --target-hi: #e2553a;
+  --target-lo: #a92e1c;
+  --target-line: #7e2213;
+  --target-2: #f0b3a0;
+  --target-far: #b8604c;
+  --target-2-far: #d5a597;
+  --metal: #a7acb2;
+  --iron: #2d3034;
+  --iron-ring: #53585e;
+  --pad: #3a3e44;
 
   --radius: 14px;
   --radius-sm: 10px;
@@ -54,6 +71,15 @@
 
     --fig: #e6e4df;
     --fig-far: #5f6165;
+    --skin-far: #8b8377;
+    --skin-far-line: #5d564d;
+    --skin-line: #564f46;
+    --metal: #7d838a;
+    --iron: #121315;
+    --iron-ring: #4a4f55;
+    --pad: #4b5057;
+    --target-far: #a0503e;
+    --target-2-far: #9c7568;
     --fig-floor: #34363a;
     --equip: #a3a6aa;
     --equip-fill: #2d2f33;
@@ -84,6 +110,15 @@
 
   --fig: #e6e4df;
   --fig-far: #5f6165;
+  --skin-far: #8b8377;
+  --skin-far-line: #5d564d;
+  --skin-line: #564f46;
+  --metal: #7d838a;
+  --iron: #121315;
+  --iron-ring: #4a4f55;
+  --pad: #4b5057;
+  --target-far: #a0503e;
+  --target-2-far: #9c7568;
   --fig-floor: #34363a;
   --equip: #a3a6aa;
   --equip-fill: #2d2f33;
@@ -508,8 +543,14 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--a
 .ex-card-body strong { font-size: 14px; font-weight: 600; line-height: 1.3; }
 .ex-grid-compact .ex-card-body { padding: 8px 10px 10px; }
 
-.detail { display: grid; grid-template-columns: 1.1fr 1fr; gap: 28px; align-items: start; }
-.detail-fig { background: var(--surface-2); border-radius: var(--radius); padding: 16px 20px 8px; }
+.detail { display: grid; grid-template-columns: 1.15fr 1fr; gap: 20px 28px; align-items: start; }
+.detail-fig { grid-column: 1 / -1; }
+.detail-trains { display: flex; flex-direction: column; gap: 6px; }
+.detail-trains .mtag { font-size: 14px; }
+.detail-muscles .h-small { margin-top: 0; }
+.detail-muscles .muscle-map { flex-direction: column; align-items: flex-start; }
+.detail-muscles .muscle-map svg { width: 220px; }
+.detail-fig { background: var(--surface-2); border-radius: var(--radius); padding: 8px 12px 4px; }
 .detail-fig-sm { max-width: 320px; margin: 0 auto; width: 100%; }
 .detail-info { display: flex; flex-direction: column; gap: 12px; }
 .detail-info .h-small { margin: 6px 0 0; }
@@ -975,3 +1016,12 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--a
 .filter-row .search { flex: 1 1 240px; max-width: 380px; }
 .equip-select { width: auto; flex: 0 0 auto; }
 .chip-count { font-size: 11px; opacity: 0.6; margin-left: 2px; font-variant-numeric: tabular-nums; }
+.muscle-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+.mtag { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 500; line-height: 1.3; color: var(--text); }
+.mtag::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--muted); flex: none; }
+.mtag-1::before { background: var(--target-hi); }
+.mtag-2 { color: var(--muted); }
+.mtag-2::before { background: var(--target-2); }
+.mtag + .mtag { margin-left: 4px; }
+.log-head .muscle-tags { margin: 2px 0 2px; }
+.detail-fig .exercise-figure { max-height: min(62vh, 460px); }

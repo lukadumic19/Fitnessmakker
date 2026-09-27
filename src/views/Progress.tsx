@@ -1,9 +1,9 @@
+import { ExerciseImage } from '../illustrations/ExerciseImage';
 import { useMemo, useState } from 'react';
 import { Icon } from '../components/Icon';
 import { LineChart } from '../components/LineChart';
 import { NumberWheel } from '../components/Wheel';
 import { Modal, confirmAction } from '../components/Modal';
-import { ExerciseFigure } from '../illustrations/ExerciseFigure';
 import { href } from '../router';
 import { remove, upsert, useProfileStore } from '../store';
 import type { BodyEntry } from '../types';
@@ -289,7 +289,7 @@ function Strength() {
           return (
             <button key={e!.id} className={`strength-item ${selected === e!.id ? 'is-active' : ''}`} onClick={() => setSel(e!.id)}>
               <span className="thumb">
-                <ExerciseFigure illustration={e!.illustration} />
+                <ExerciseImage exercise={e!} />
               </span>
               <span className="grow">
                 <strong>{e!.name}</strong>

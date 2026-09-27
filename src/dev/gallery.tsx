@@ -4,13 +4,14 @@
  * #anim to animate). Not part of the production build.
  */
 import { createRoot } from 'react-dom/client';
-import { EXERCISES } from '../data/exercises';
+import { EXERCISES, exerciseMuscles } from '../data/exercises';
 import { ExerciseFigure } from '../illustrations/ExerciseFigure';
 import '../styles/app.css';
 import '../styles/figure.css';
 
 const ids = location.search.slice(1).split(',').filter(Boolean);
 const list = ids.length ? EXERCISES.filter((e) => ids.includes(e.id)) : EXERCISES;
+const labels = new URLSearchParams(location.hash.slice(1)).has('labels');
 const cols = Number(new URLSearchParams(location.hash.slice(1)).get('cols') ?? 4);
 
 createRoot(document.getElementById('root')!).render(
@@ -23,7 +24,7 @@ createRoot(document.getElementById('root')!).render(
         <div style={{ display: 'flex', gap: 6, background: 'var(--surface-2)', borderRadius: 8 }}>
           {[0, 1].map((t) => (
             <div key={t} style={{ flex: 1, minWidth: 0 }}>
-              <ExerciseFigure illustration={{ ...e.illustration, thumb: t as 0 | 1 }} />
+              <ExerciseFigure illustration={{ ...e.illustration, thumb: t as 0 | 1 }} muscles={exerciseMuscles(e)} labels={labels} />
             </div>
           ))}
         </div>

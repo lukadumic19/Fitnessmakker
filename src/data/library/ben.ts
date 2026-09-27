@@ -347,8 +347,8 @@ export const BEN: Exercise[] = [
       thumb: 1,
       highlight: ['thigh'],
       poses: [
-        { hip: [100, 88], arms: [-10, -60], legs: [0, 0], legsR: { to: [142, 150], bend: 1 }, legsL: { to: [58, 150], bend: -1 } },
-        { hip: [80, 110], arms: [-10, -60], legs: [0, 0], legsR: { to: [142, 150], bend: 1 }, legsL: { to: [58, 150], bend: -1 } },
+        { hip: [100, 88], arms: [8, 4], legs: [0, 0], legsR: { to: [142, 150], bend: 1 }, legsL: { to: [58, 150], bend: -1 } },
+        { hip: [80, 110], arms: [8, 4], legs: [0, 0], legsR: { to: [142, 150], bend: 1 }, legsL: { to: [58, 150], bend: -1 } },
       ],
     },
   },

@@ -1,3 +1,5 @@
+import { MuscleTags } from '../components/MuscleTags';
+import { ExerciseImage } from '../illustrations/ExerciseImage';
 import { useState } from 'react';
 import { EQUIPMENT_LABELS, EXERCISES, MUSCLE_LABELS, exerciseMuscles, type Exercise } from '../data/exercises';
 import { MuscleMap } from '../illustrations/MuscleMap';
@@ -51,21 +53,14 @@ export function ExerciseDetail({ exercise, onClose }: { exercise: Exercise; onCl
     <Modal title={exercise.name} onClose={onClose} wide>
       <div className="detail">
         <div className="detail-fig">
-          <ExerciseFigure illustration={exercise.illustration} animate title={exercise.name} />
+          <ExerciseImage exercise={exercise} animate labels />
         </div>
         <div className="detail-info">
-          <div className="tags">
-            <span className="tag tag-accent">{MUSCLE_LABELS[exercise.primary]}</span>
-            {exercise.secondary.map((m) => (
-              <span key={m} className="tag">
-                {MUSCLE_LABELS[m]}
-              </span>
-            ))}
-            <span className="tag tag-outline">{EQUIPMENT_LABELS[exercise.equipment]}</span>
+          <div className="detail-trains">
+            <span className="eyebrow">Træner</span>
+            <MuscleTags exercise={exercise} secondary max={6} />
           </div>
           <p>{exercise.description}</p>
-          <h3 className="h-small">Muskler</h3>
-          <MuscleMap {...exerciseMuscles(exercise)} />
           {exercise.cues.length > 0 && (
             <>
               <h3 className="h-small">Teknik</h3>
@@ -76,6 +71,14 @@ export function ExerciseDetail({ exercise, onClose }: { exercise: Exercise; onCl
               </ol>
             </>
           )}
+          <div className="tags">
+            <span className="tag tag-outline">{EQUIPMENT_LABELS[exercise.equipment]}</span>
+            <span className="tag">{MUSCLE_LABELS[exercise.primary]}</span>
+          </div>
+        </div>
+        <div className="detail-muscles">
+          <h3 className="h-small">Muskler</h3>
+          <MuscleMap {...exerciseMuscles(exercise)} />
         </div>
       </div>
 

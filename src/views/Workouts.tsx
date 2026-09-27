@@ -1,3 +1,5 @@
+import { MuscleTags } from '../components/MuscleTags';
+import { ExerciseImage } from '../illustrations/ExerciseImage';
 import { useEffect, useMemo, useState } from 'react';
 import { ExercisePicker } from '../components/ExercisePicker';
 import { NumberWheel, PickerSheet, ValueButton } from '../components/Wheel';
@@ -5,7 +7,6 @@ import { Icon } from '../components/Icon';
 import { Modal, confirmAction } from '../components/Modal';
 import { exerciseMuscles, type Exercise } from '../data/exercises';
 import { MuscleMap } from '../illustrations/MuscleMap';
-import { ExerciseFigure } from '../illustrations/ExerciseFigure';
 import { href, navigate } from '../router';
 import { remove, upsert, useProfileStore } from '../store';
 import type { SetLog, Workout, WorkoutEntry } from '../types';
@@ -342,10 +343,11 @@ export function ActiveWorkout() {
           <section key={entry.id} className="card log-card">
             <header className="log-head">
               <button className="log-fig" onClick={() => ex && setInfo(ex)} aria-label={`Vis ${ex?.name}`}>
-                {ex && <ExerciseFigure illustration={ex.illustration} />}
+                {ex && <ExerciseImage exercise={ex} />}
               </button>
               <div className="grow">
                 <h3>{ex?.name ?? 'Ukendt øvelse'}</h3>
+                {ex && <MuscleTags exercise={ex} secondary />}
                 <p className="muted small">
                   {planned ? `Plan: ${planned.sets} × ${planned.reps}${planned.weight ? ` @ ${fmtNum(planned.weight)} kg` : ''}` : ''}
                   {planned && prev ? ' · ' : ''}
@@ -552,7 +554,7 @@ function ExerciseInfo({ exercise, onClose }: { exercise: Exercise; onClose: () =
   return (
     <Modal title={exercise.name} onClose={onClose}>
       <div className="detail-fig detail-fig-sm">
-        <ExerciseFigure illustration={exercise.illustration} animate />
+        <ExerciseImage exercise={exercise} animate labels />
       </div>
       <p>{exercise.description}</p>
       <MuscleMap {...exerciseMuscles(exercise)} />
@@ -653,7 +655,7 @@ export function WorkoutDetail({ id }: { id: string }) {
         {entries.map(({ e, ex, isPr }) => (
           <section key={e.id} className="card summary-card">
             <a className="log-fig" href={href(`/oevelser/${e.exerciseId}`)}>
-              {ex && <ExerciseFigure illustration={ex.illustration} />}
+              {ex && <ExerciseImage exercise={ex} />}
             </a>
             <div className="grow">
               <h3>

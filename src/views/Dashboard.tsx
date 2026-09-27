@@ -1,5 +1,5 @@
+import { ExerciseImage } from '../illustrations/ExerciseImage';
 import { Icon } from '../components/Icon';
-import { ExerciseFigure } from '../illustrations/ExerciseFigure';
 import { href } from '../router';
 import { useProfileStore } from '../store';
 import { e1rm, fmtKg, fmtNum, fmtRelative, nextProgramDay, setDone, startOfWeek, weekStreak, workoutVolume } from '../utils';
@@ -105,7 +105,7 @@ export function Dashboard() {
                 return (
                   ex && (
                     <div key={pe.id} className="hero-fig" title={ex.name}>
-                      <ExerciseFigure illustration={ex.illustration} />
+                      <ExerciseImage exercise={ex} />
                       <span>{ex.name}</span>
                       <small className="muted">
                         {pe.sets} × {pe.reps}

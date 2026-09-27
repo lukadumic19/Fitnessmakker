@@ -1,12 +1,12 @@
+import { MuscleTags } from '../components/MuscleTags';
+import { ExerciseImage } from '../illustrations/ExerciseImage';
 import { useEffect, useState } from 'react';
 import { ExercisePicker } from '../components/ExercisePicker';
 import { PlanPicker, fmtClock, repsLabel } from '../components/PlanPicker';
 import { ValueButton } from '../components/Wheel';
 import { Icon } from '../components/Icon';
 import { Modal, confirmAction } from '../components/Modal';
-import { MUSCLE_LABELS } from '../data/exercises';
 import { TEMPLATES, programFromTemplate } from '../data/templates';
-import { ExerciseFigure } from '../illustrations/ExerciseFigure';
 import { href, navigate } from '../router';
 import { remove, upsert, useProfileStore } from '../store';
 import type { Program, ProgramDay } from '../types';
@@ -131,7 +131,7 @@ function ExThumb({ exerciseId }: { exerciseId: string }) {
   if (!ex) return null;
   return (
     <span className="thumb" title={ex.name}>
-      <ExerciseFigure illustration={ex.illustration} />
+      <ExerciseImage exercise={ex} />
     </span>
   );
 }
@@ -268,12 +268,12 @@ export function ProgramEditor({ id }: { id: string }) {
               return (
                 <li key={pe.id} className="plan-row">
                   <a className="plan-fig" href={href(`/oevelser/${pe.exerciseId}`)} aria-label={`Se ${ex?.name}`}>
-                    {ex && <ExerciseFigure illustration={ex.illustration} />}
+                    {ex && <ExerciseImage exercise={ex} />}
                   </a>
                   <div className="plan-main">
                     <div className="plan-title">
                       <strong>{ex?.name ?? 'Ukendt øvelse'}</strong>
-                      <span className="muted small">{ex && MUSCLE_LABELS[ex.primary]}</span>
+                      {ex && <MuscleTags exercise={ex} />}
                     </div>
                     <div className="plan-fields">
                       {(
