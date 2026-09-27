@@ -6,6 +6,7 @@ import { upsert, useStore } from '../store';
 import type { Profile } from '../types';
 import { nowIso, PROFILE_COLORS, uid } from '../utils';
 import { navigate } from '../router';
+import { demoData } from '../data/demo';
 
 export function ProfileForm({
   initial,
@@ -82,7 +83,7 @@ export function ProfileForm({
 
 export function ProfilePicker() {
   const { data, update, setProfileId } = useStore();
-  const [creating, setCreating] = useState(data.profiles.length === 0);
+  const [creating, setCreating] = useState(false);
 
   const choose = (id: string) => {
     setProfileId(id);
@@ -122,6 +123,18 @@ export function ProfilePicker() {
             <span className="picker-name">Ny profil</span>
           </button>
         </div>
+        {!data.profiles.some((p) => p.name === 'Eksempel') && (
+          <button
+            className="btn btn-ghost picker-demo"
+            onClick={() => {
+              const demo = demoData();
+              update(demo.apply);
+              choose(demo.profileId);
+            }}
+          >
+            Prøv med eksempeldata
+          </button>
+        )}
       </div>
 
       {creating && (

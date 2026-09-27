@@ -236,19 +236,26 @@ export function ActiveWorkout() {
   const setSet = (entryId: string, setId: string, patch: Partial<SetLog>) =>
     setEntry(entryId, (e) => ({ ...e, sets: e.sets.map((s) => (s.id === setId ? { ...s, ...patch } : s)) }));
 
-  const finish = () => {
+  const finish = async () => {
     const entries = w.entries
       .map((e) => ({ ...e, sets: e.sets.filter(setDone) }))
       .filter((e) => e.sets.length);
     if (!entries.length) {
-      if (confirmAction('Ingen sæt er markeret som udført. Vil du kassere træningen?')) {
+      if (await confirmAction('Ingen sæt er markeret som udført. Vil du kassere træningen?', { confirmLabel: 'Kassér' })) {
         update(remove('workouts', w.id));
         navigate('/traening');
       }
       return;
     }
     const undone = w.entries.reduce((n, e) => n + e.sets.filter((s) => !setDone(s)).length, 0);
-    if (undone && !confirmAction(`${undone} sæt er ikke markeret som udført og bliver ikke gemt. Afslut alligevel?`)) return;
+    if (
+      undone &&
+      !(await confirmAction(`${undone} sæt er ikke markeret som udført og bliver ikke gemt. Afslut alligevel?`, {
+        confirmLabel: 'Afslut',
+        danger: false,
+      }))
+    )
+      return;
     save({ ...w, entries, finishedAt: nowIso() });
     navigate(`/traening/${w.id}`);
   };
@@ -273,8 +280,8 @@ export function ActiveWorkout() {
         <div className="head-actions">
           <button
             className="btn btn-ghost"
-            onClick={() => {
-              if (confirmAction('Kassér denne træning? Det kan ikke fortrydes.')) {
+            onClick={async () => {
+              if (await confirmAction('Kassér denne træning? Det kan ikke fortrydes.', { confirmLabel: 'Kassér' })) {
                 update(remove('workouts', w.id));
                 navigate('/traening');
               }
@@ -316,10 +323,14 @@ export function ActiveWorkout() {
                 <button
                   className="icon-btn"
                   aria-label="Fjern øvelse"
-                  onClick={() =>
-                    (!entry.sets.some(setDone) || confirmAction(`Fjern ${ex?.name} fra træningen?`)) &&
-                    save({ ...w, entries: w.entries.filter((e) => e.id !== entry.id) })
-                  }
+                  onClick={async () => {
+                    if (entry.sets.some(setDone) && !(await confirmAction(`Fjern ${ex?.name} fra træningen?`, { confirmLabel: 'Fjern' })))
+                      return;
+                    update((d) => ({
+                      ...d,
+                      workouts: d.workouts.map((x) => (x.id === w.id ? { ...x, entries: x.entries.filter((e) => e.id !== entry.id) } : x)),
+                    }));
+                  }}
                 >
                   <Icon name="trash" size={18} />
                 </button>
@@ -594,8 +605,8 @@ export function WorkoutDetail({ id }: { id: string }) {
         <span className="muted small">Logget {fmtRelative(w.finishedAt).toLowerCase()}</span>
         <button
           className="btn btn-danger-ghost"
-          onClick={() => {
-            if (confirmAction('Slet denne træning permanent?')) {
+          onClick={async () => {
+            if (await confirmAction('Slet denne træning permanent?', { confirmLabel: 'Slet' })) {
               update(remove('workouts', w.id));
               navigate('/traening');
             }

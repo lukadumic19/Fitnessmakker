@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Icon } from './Icon';
 
@@ -42,6 +42,62 @@ export function Modal({
   );
 }
 
-export function confirmAction(message: string) {
-  return window.confirm(message);
+interface ConfirmRequest {
+  message: string;
+  confirmLabel: string;
+  danger: boolean;
+  resolve: (ok: boolean) => void;
+}
+
+let showConfirm: ((r: ConfirmRequest) => void) | null = null;
+
+/**
+ * In-page replacement for window.confirm (which some embedded viewers block).
+ * Resolves true when the user confirms.
+ */
+export function confirmAction(
+  message: string,
+  { confirmLabel = 'Fortsæt', danger = true }: { confirmLabel?: string; danger?: boolean } = {},
+): Promise<boolean> {
+  return new Promise((resolve) => {
+    if (!showConfirm) return resolve(window.confirm(message));
+    showConfirm({ message, confirmLabel, danger, resolve });
+  });
+}
+
+/** Mount once near the app root. */
+export function ConfirmHost() {
+  const [req, setReq] = useState<ConfirmRequest | null>(null);
+  useEffect(() => {
+    showConfirm = setReq;
+    return () => {
+      showConfirm = null;
+    };
+  }, []);
+  if (!req) return null;
+  const close = (ok: boolean) => {
+    req.resolve(ok);
+    setReq(null);
+  };
+  return (
+    <Modal
+      title="Er du sikker?"
+      onClose={() => close(false)}
+      footer={
+        <>
+          <span />
+          <div className="btn-row">
+            <button className="btn btn-ghost" onClick={() => close(false)}>
+              Annuller
+            </button>
+            <button className={`btn ${req.danger ? 'btn-danger' : 'btn-primary'}`} autoFocus onClick={() => close(true)}>
+              {req.confirmLabel}
+            </button>
+          </div>
+        </>
+      }
+    >
+      <p>{req.message}</p>
+    </Modal>
+  );
 }

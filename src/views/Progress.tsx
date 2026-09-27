@@ -152,8 +152,8 @@ function Body() {
             update(upsert('body', e));
             setEditing(null);
           }}
-          onDelete={() => {
-            if (confirmAction('Slet denne måling?')) {
+          onDelete={async () => {
+            if (await confirmAction('Slet denne måling?', { confirmLabel: 'Slet' })) {
               update(remove('body', editing.id));
               setEditing(null);
             }

@@ -124,8 +124,8 @@ export function ExerciseDetail({ exercise, onClose }: { exercise: Exercise; onCl
         <div className="form-actions">
           <button
             className="btn btn-danger-ghost"
-            onClick={() => {
-              if (confirmAction(`Slet “${exercise.name}”? Loggede sæt bevares ikke i statistik.`)) {
+            onClick={async () => {
+              if (await confirmAction(`Slet “${exercise.name}”? Loggede sæt bevares ikke i statistik.`, { confirmLabel: 'Slet' })) {
                 update(remove('customExercises', exercise.id));
                 onClose();
               }

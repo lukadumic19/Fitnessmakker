@@ -26,7 +26,7 @@ export function Settings() {
     try {
       const parsed = JSON.parse(await file.text()) as AppData;
       if (!Array.isArray(parsed.profiles) || !Array.isArray(parsed.workouts)) throw new Error('format');
-      if (!confirmAction('Importen erstatter alle data i denne browser (alle profiler). Fortsæt?')) return;
+      if (!(await confirmAction('Importen erstatter alle data i denne browser (alle profiler).', { confirmLabel: 'Importér' }))) return;
       update(() => ({ ...parsed, version: 1, programs: parsed.programs ?? [], body: parsed.body ?? [], customExercises: parsed.customExercises ?? [] }));
       setMsg(`Importeret: ${parsed.profiles.length} profiler og ${parsed.workouts.length} træninger.`);
       if (!parsed.profiles.some((p) => p.id === profile.id)) setProfileId(null);
@@ -74,6 +74,18 @@ export function Settings() {
           <button className="btn" onClick={exportData}>
             <Icon name="download" size={18} /> Eksportér alle data
           </button>
+          <button
+            className="btn"
+            onClick={() => {
+              const text = JSON.stringify(data);
+              navigator.clipboard
+                ?.writeText(text)
+                .then(() => setMsg('Alle data er kopieret. Gem teksten i en fil (.json), så kan du importere den senere.'))
+                .catch(() => setMsg('Kopiering blev blokeret af browseren. Brug “Eksportér” i stedet.'));
+            }}
+          >
+            <Icon name="copy" size={18} /> Kopiér data
+          </button>
           <button className="btn" onClick={() => fileRef.current?.click()}>
             <Icon name="upload" size={18} /> Importér
           </button>
@@ -97,8 +109,8 @@ export function Settings() {
         <p className="muted small">Sletter {profile.name} og alle tilhørende programmer, træninger og målinger permanent.</p>
         <button
           className="btn btn-danger"
-          onClick={() => {
-            if (confirmAction(`Slet profilen “${profile.name}” og alle data? Det kan ikke fortrydes.`)) {
+          onClick={async () => {
+            if (await confirmAction(`Slet profilen “${profile.name}” og alle data? Det kan ikke fortrydes.`, { confirmLabel: 'Slet profil' })) {
               update(removeProfile(profile.id));
               setProfileId(null);
               navigate('/');

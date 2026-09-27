@@ -13,9 +13,12 @@ import { startWorkout } from '../workoutActions';
 
 export function useStartWorkout() {
   const { profile, workouts, update } = useProfileStore();
-  return (program?: Program, day?: ProgramDay) => {
+  return async (program?: Program, day?: ProgramDay) => {
     const active = workouts.find((w) => !w.finishedAt);
-    if (active && !confirmAction('Du har allerede en træning i gang. Vil du kassere den og starte en ny?')) {
+    if (
+      active &&
+      !(await confirmAction('Du har allerede en træning i gang. Vil du kassere den og starte en ny?', { confirmLabel: 'Start ny' }))
+    ) {
       navigate('/traening/aktiv');
       return;
     }
@@ -244,10 +247,10 @@ export function ProgramEditor({ id }: { id: string }) {
               <button
                 className="icon-btn"
                 aria-label="Slet dag"
-                onClick={() =>
-                  (!day.exercises.length || confirmAction(`Slet “${day.name}”?`)) &&
-                  setDraft({ ...draft, days: draft.days.filter((d) => d.id !== day.id) })
-                }
+                onClick={async () => {
+                  if (day.exercises.length && !(await confirmAction(`Slet “${day.name}”?`, { confirmLabel: 'Slet' }))) return;
+                  setDraft((p) => p && { ...p, days: p.days.filter((d) => d.id !== day.id) });
+                }}
               >
                 <Icon name="trash" size={18} />
               </button>
@@ -376,8 +379,8 @@ export function ProgramEditor({ id }: { id: string }) {
         </button>
         <button
           className="btn btn-danger-ghost"
-          onClick={() => {
-            if (confirmAction(`Slet programmet “${saved.name}”? Loggede træninger bevares.`)) {
+          onClick={async () => {
+            if (await confirmAction(`Slet programmet “${saved.name}”? Loggede træninger bevares.`, { confirmLabel: 'Slet' })) {
               update(remove('programs', saved.id));
               navigate('/programmer');
             }
