@@ -1025,3 +1025,10 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--a
 .mtag + .mtag { margin-left: 4px; }
 .log-head .muscle-tags { margin: 2px 0 2px; }
 .detail-fig .exercise-figure { max-height: min(62vh, 460px); }
+
+/* Installed on the home screen: no browser chrome, keep clear of the notch. */
+@media (display-mode: standalone) {
+  .topbar { padding-top: calc(10px + env(safe-area-inset-top, 0px)); top: 0; }
+  .picker { padding-top: calc(48px + env(safe-area-inset-top, 0px)); }
+  body { overscroll-behavior-y: none; }
+}
