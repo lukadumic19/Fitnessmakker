@@ -1,0 +1,63 @@
+.exercise-figure {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.exercise-figure line,
+.exercise-figure polygon {
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.fig-floor { stroke: var(--fig-floor); stroke-width: 1.2; }
+.fig-shadow { fill: #000; opacity: 0.1; }
+
+/* Body */
+.fig-skin-hi { stop-color: var(--skin-hi); }
+.fig-skin-lo { stop-color: var(--skin-lo); }
+.fig-target-hi { stop-color: var(--target-hi); }
+.fig-target-lo { stop-color: var(--target-lo); }
+.fig-skin { stroke: var(--skin-line); stroke-width: 0.7; stroke-linejoin: round; }
+.fig-skin-far { fill: var(--skin-far); stroke: var(--skin-far-line); stroke-width: 0.6; stroke-linejoin: round; }
+.fig-mus { fill: var(--skin-muscle); }
+.fig-t1 { stroke: var(--target-line); stroke-width: 0.5; }
+.fig-t1.is-far { fill: var(--target-far); stroke: none; }
+.fig-t2 { fill: var(--target-2); }
+.fig-t2.is-far { fill: var(--target-2-far); }
+.fig-hair { fill: var(--hair); }
+.fig-ear { fill: var(--skin-muscle); stroke: var(--skin-line); stroke-width: 0.4; }
+
+/* Equipment */
+.fig-plate { fill: var(--iron); stroke: var(--iron-ring); }
+.fig-plate-ring { fill: none; stroke: var(--iron-ring); }
+.fig-plate-edge { stroke: var(--iron); stroke-linecap: butt; }
+.fig-weight { fill: var(--iron); stroke: var(--iron-ring); stroke-linejoin: round; }
+.fig-weight-ring { fill: none; stroke: var(--iron-ring); }
+.fig-kb-handle { fill: none; stroke: var(--iron); }
+.fig-metal { stroke: var(--metal); }
+.fig-metal-dot { fill: var(--metal); }
+.fig-machine-ring { fill: none; stroke: var(--metal); }
+.fig-pad { fill: var(--pad); stroke: var(--pad); stroke-linejoin: round; }
+line.fig-pad { stroke: var(--pad); }
+.fig-cable { stroke: var(--iron-ring); }
+.fig-pulley { fill: var(--surface); stroke: var(--metal); }
+
+/* Labels */
+.fig-label text { font-family: var(--font); font-size: 7.6px; font-weight: 600; fill: var(--text); letter-spacing: 0.01em; }
+.fig-leader { stroke: var(--target-lo); stroke-width: 0.7; }
+.fig-anchor { fill: var(--target-hi); stroke: var(--surface); stroke-width: 1; }
+
+/* Muscle map */
+.muscle-map { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+.muscle-map svg { width: 190px; max-width: 100%; height: auto; flex: none; }
+.mm-base { fill: var(--skin-hi); stroke: var(--skin-hi); stroke-linecap: round; }
+.mm-muscle { fill: var(--skin-muscle); }
+.mm-primary { fill: var(--target-hi); }
+.mm-secondary { fill: var(--target-2); }
+.mm-caption { fill: var(--muted); font-size: 9px; font-family: var(--font); letter-spacing: 0.04em; }
+.mm-legend { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; font-size: 13px; min-width: 140px; flex: 1; }
+.mm-legend li { display: flex; align-items: center; gap: 8px; }
+.mm-dot { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+.mm-dot-primary { background: var(--target-hi); }
+.mm-dot-secondary { background: var(--target-2); }
+.mm-legend-h { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin-top: 4px; }
