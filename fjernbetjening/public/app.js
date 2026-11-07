@@ -48,7 +48,109 @@ const activeTv = () => state.tvs.find((t) => t.id === state.activeId) || null;
 
 // ---------- API ----------
 
+// ---------- Demo i browseren (uden bro og TV) ----------
+
+let demoMode = !!window.FJERN_DEMO || new URLSearchParams(location.search).has('demo');
+
+const DEMO_CATALOG = [
+  ['netflix', 'Netflix', '#e50914'], ['youtube', 'YouTube', '#ff0033'], ['drtv', 'DR TV', '#c8102e'],
+  ['tv2play', 'TV 2 Play', '#0050ff'], ['disney', 'Disney+', '#113ccf'], ['prime', 'Prime Video', '#00a8e1'],
+  ['max', 'Max', '#002be7'], ['viaplay', 'Viaplay', '#ff1e46'], ['skyshowtime', 'SkyShowtime', '#5b2be0'],
+  ['spotify', 'Spotify', '#1db954'], ['plex', 'Plex', '#e5a00d'], ['twitch', 'Twitch', '#9146ff'],
+].map(([id, name, color]) => ({ id, name, color }));
+
+const DEMO_INPUTS = [
+  { id: 'tv', name: 'TV' }, { id: 'hdmi1', name: 'HDMI 1 · PlayStation' },
+  { id: 'hdmi2', name: 'HDMI 2 · Apple TV' }, { id: 'hdmi3', name: 'HDMI 3' },
+];
+
+const demo = {
+  tv: { power: 'on', volume: 18, muted: false, channel: 1, app: 'TV', digits: '', digitTimer: null },
+  state: {
+    tvs: [{ id: 'demo', name: 'Stue-TV (demo)', type: 'demo', paired: true, mac: null,
+      capabilities: { text: true, apps: true, inputs: true, pointer: true, status: true, wol: false } }],
+    activeId: 'demo',
+    favorites: [
+      { id: 'f1', name: 'DR1', number: '1' }, { id: 'f2', name: 'TV 2', number: '2' },
+      { id: 'f3', name: 'DR2', number: '3' }, { id: 'f4', name: 'TV3', number: '4' },
+    ],
+    macros: [
+      { id: 'm1', name: 'Filmaften', icon: '🍿', steps: [{ power: 'on' }, { wait: 1500 }, { app: 'netflix' }] },
+      { id: 'm2', name: 'Nyheder', icon: '📰', steps: [{ power: 'on' }, { wait: 1000 }, { key: 'exit' }, { channel: '1' }] },
+      { id: 'm3', name: 'Spring intro over', icon: '⏩', steps: [{ key: 'forward', times: 3 }] },
+      { id: 'm4', name: 'Godnat', icon: '🌙', steps: [{ sleep: 30 }] },
+    ],
+    sleep: null,
+    catalog: DEMO_CATALOG,
+    types: { demo: 'Demo-TV (i browseren)' },
+  },
+};
+
+const demoWait = (ms) => new Promise((r) => setTimeout(r, ms));
+
+function demoKey(key) {
+  const t = demo.tv;
+  if (key === 'power') {
+    t.power = t.power === 'on' ? 'standby' : 'on';
+    return;
+  }
+  if (t.power !== 'on') throw new Error('Demo-TV\'et er slukket – tryk på tænd-knappen');
+  if (key === 'vol_up') (t.volume = Math.min(100, t.volume + 1)), (t.muted = false);
+  if (key === 'vol_down') (t.volume = Math.max(0, t.volume - 1)), (t.muted = false);
+  if (key === 'mute') t.muted = !t.muted;
+  if (key === 'ch_up') (t.channel++, (t.app = 'TV'));
+  if (key === 'ch_down') ((t.channel = Math.max(1, t.channel - 1)), (t.app = 'TV'));
+  if (key === 'home') t.app = 'Startskærm';
+  if (/^[0-9]$/.test(key)) {
+    t.digits = (t.digits + key).slice(-4);
+    clearTimeout(t.digitTimer);
+    t.digitTimer = setTimeout(() => {
+      t.channel = Number(t.digits) || t.channel;
+      t.app = 'TV';
+      t.digits = '';
+    }, 900);
+  }
+}
+
+async function demoSteps(steps) {
+  for (const s of steps) {
+    if (s.key) for (let i = 0; i < (s.times || 1); i++) (demoKey(s.key), await demoWait(150));
+    else if (s.channel) (demo.tv.channel = Number(s.channel), (demo.tv.app = 'TV'));
+    else if (s.app) demo.tv.app = DEMO_CATALOG.find((a) => a.id === s.app)?.name || s.app;
+    else if (s.wait) await demoWait(Math.min(s.wait, 3000));
+    else if (s.power) demo.tv.power = s.power === 'on' ? 'on' : 'standby';
+    else if (s.sleep !== undefined) demo.state.sleep = s.sleep ? { tvId: 'demo', minutes: s.sleep, endsAt: Date.now() + s.sleep * 60000 } : null;
+  }
+}
+
+async function demoApi(method, path, body = {}) {
+  await demoWait(40);
+  const S = demo.state;
+  const m = /^\/api\/tv\/[^/]+\/(\w+)$/.exec(path);
+  const sub = m?.[1];
+  if (path === '/api/state') return structuredClone(S);
+  if (path === '/api/active') return { ok: true };
+  if (path === '/api/favorites') return (S.favorites = body.map((f, i) => ({ id: f.id || 'f' + Date.now() + i, ...f })));
+  if (path === '/api/macros') return (S.macros = body.map((x, i) => ({ ...x, id: x.id || 'm' + Date.now() + i })));
+  if (path === '/api/sleep') return (S.sleep = body.minutes ? { tvId: 'demo', minutes: body.minutes, endsAt: Date.now() + body.minutes * 60000 } : null);
+  if (path === '/api/discover' || path.startsWith('/api/tvs'))
+    throw new Error('I demoen kan du ikke tilføje rigtige TV\'er – det kræver broen (server.js) på dit netværk');
+  if (sub === 'key') return demoKey(body.key), { ok: true };
+  if (sub === 'status') {
+    const t = demo.tv;
+    return { online: true, power: t.power, volume: t.volume, muted: t.muted, app: t.app, channel: t.channel };
+  }
+  if (sub === 'launch') return demoSteps([{ app: body.app }]), { ok: true };
+  if (sub === 'macro') return await demoSteps(body.steps || S.macros.find((x) => x.id === body.id)?.steps || []), { ok: true };
+  if (sub === 'apps') return { apps: DEMO_CATALOG.map(({ id, name }) => ({ id, name })) };
+  if (sub === 'inputs') return { inputs: DEMO_INPUTS };
+  if (sub === 'input') return (demo.tv.app = DEMO_INPUTS.find((i) => i.id === body.id)?.name), { ok: true };
+  if (sub === 'power') return (demo.tv.power = body.on === false ? 'standby' : 'on'), { ok: true };
+  return { ok: true };
+}
+
 async function api(method, path, body) {
+  if (demoMode) return demoApi(method, path, body);
   let res;
   try {
     res = await fetch(path, {
@@ -91,6 +193,16 @@ function toast(msg, { error = false, ms = 2200 } = {}) {
   toastTimer = setTimeout(() => t.classList.remove('show'), ms);
 }
 
+function askConfirm(msg) {
+  // I indlejrede visninger kan confirm() være blokeret – spørg så ikke
+  if (window.FJERN_DEMO) return true;
+  try {
+    return confirm(msg);
+  } catch {
+    return true;
+  }
+}
+
 function haptic(ms = 12) {
   if (prefs.haptics && navigator.vibrate) navigator.vibrate(ms);
 }
@@ -125,6 +237,7 @@ async function sendKey(key) {
   haptic();
   try {
     await api('POST', `/api/tv/${tv.id}/key`, { key });
+    if (demoMode) toast(`📺 ${KEY_LABELS[key] || key}`, { ms: 900 });
     if (['vol_up', 'vol_down', 'mute', 'power'].includes(key)) setTimeout(pollStatus, 250);
   } catch (err) {
     showError(err);
@@ -309,8 +422,15 @@ function renderBanner() {
   b.hidden = true;
   if (offline) {
     b.hidden = false;
-    b.innerHTML = `<span>Kan ikke nå broen. Kør <b>npm start</b> i mappen <b>fjernbetjening</b> på en computer på samme Wi-Fi.</span><button class="btn" id="bannerBtn" type="button">Prøv igen</button>`;
+    b.innerHTML = `<span>Kan ikke nå broen. Kør <b>npm start</b> i mappen <b>fjernbetjening</b> på en computer på samme Wi-Fi.</span><button class="btn" id="bannerBtn" type="button">Prøv igen</button><button class="btn primary" id="demoBtn" type="button">Prøv demo</button>`;
     $('#bannerBtn').onclick = loadState;
+    $('#demoBtn').onclick = () => {
+      demoMode = true;
+      loadState().then(pollStatus);
+    };
+  } else if (demoMode) {
+    b.hidden = false;
+    b.innerHTML = `<span>🎮 <b>Demo</b> – knapperne styrer et virtuelt TV. Se lydstyrke, kanal og app ændre sig foroven.</span>`;
   } else if (!tv) {
     b.hidden = false;
     b.innerHTML = `<span>Velkommen! Tilføj dit TV for at komme i gang.</span><button class="btn primary" id="bannerBtn" type="button">Tilføj TV</button>`;
@@ -745,7 +865,7 @@ function openMacroEditor(macro) {
     };
     if (macro) {
       $('#mDelete').onclick = async () => {
-        if (!confirm(`Slet "${macro.name}"?`)) return;
+        if (!askConfirm(`Slet "${macro.name}"?`)) return;
         state.macros = await api('PUT', '/api/macros', state.macros.filter((m) => m.id !== macro.id));
         closeSheet();
         renderMacros();
@@ -781,7 +901,7 @@ async function sendText(enter) {
 function setupMic() {
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   const btn = $('#micBtn');
-  if (!SR) return;
+  if (!SR || window.FJERN_DEMO) return;
   btn.hidden = false;
   let rec = null;
   btn.onclick = () => {
@@ -992,7 +1112,7 @@ function openTvForm(tv) {
 
   if (tv) {
     $('#fDelete').onclick = async () => {
-      if (!confirm(`Slet ${tv.name}?`)) return;
+      if (!askConfirm(`Slet ${tv.name}?`)) return;
       await api('DELETE', `/api/tvs/${tv.id}`);
       closeSheet();
       await loadState();
@@ -1188,7 +1308,7 @@ function init() {
     if (!document.hidden) loadState().then(pollStatus);
   });
 
-  if ('serviceWorker' in navigator && window.isSecureContext) {
+  if ('serviceWorker' in navigator && window.isSecureContext && !window.FJERN_DEMO) {
     navigator.serviceWorker.register('./sw.js').catch(() => {});
   }
 }
