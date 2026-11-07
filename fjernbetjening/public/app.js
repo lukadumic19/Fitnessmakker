@@ -150,6 +150,7 @@ async function demoApi(method, path, body = {}) {
 }
 
 async function api(method, path, body) {
+  if (method !== 'GET' && path.startsWith('/api/tv/')) flashLed();
   if (demoMode) return demoApi(method, path, body);
   let res;
   try {
@@ -191,6 +192,15 @@ function toast(msg, { error = false, ms = 2200 } = {}) {
   t.classList.add('show');
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => t.classList.remove('show'), ms);
+}
+
+let ledTimer;
+function flashLed() {
+  const led = document.getElementById('led');
+  if (!led) return;
+  led.classList.add('on');
+  clearTimeout(ledTimer);
+  ledTimer = setTimeout(() => led.classList.remove('on'), 140);
 }
 
 function askConfirm(msg) {

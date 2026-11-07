@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
-    <meta name="theme-color" content="#0f1012" />
+    <meta name="theme-color" content="#17120e" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-title" content="Fjernbetjening" />
@@ -12,6 +12,9 @@
     <link rel="icon" href="./icon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="./icon.svg" />
     <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="./style.css" />
     <title>Fjernbetjening</title>
   </head>
@@ -64,30 +67,41 @@
 
     <div class="app">
       <header class="topbar">
-        <button class="tv-picker" id="tvPicker" type="button" aria-label="Vælg TV">
-          <span class="dot" id="statusDot"></span>
-          <span class="tv-picker-text">
-            <span class="tv-name" id="tvName">Intet TV</span>
+        <div class="bezel">
+          <button class="tv-picker lcd" id="tvPicker" type="button" aria-label="Vælg TV">
+            <span class="lcd-line">
+              <span class="dot" id="statusDot"></span>
+              <span class="tv-name" id="tvName">Intet TV</span>
+              <span class="lcd-ch">▼</span>
+            </span>
             <span class="tv-sub" id="tvSub">Tryk for at tilføje</span>
-          </span>
-          <svg class="ico sm"><use href="#i-chev" /></svg>
-        </button>
-        <button class="btn-power" data-key="power" data-hold="poweron" type="button" aria-label="Tænd/sluk">
-          <svg class="ico"><use href="#i-power" /></svg>
-        </button>
+            <span class="vol-meter" id="volMeter" hidden>
+              <span class="vol-label">VOL</span>
+              <span class="vol-track"><span class="vol-fill" id="volFill"></span></span>
+              <span id="volText">–</span>
+            </span>
+          </button>
+        </div>
+        <div class="power-col">
+          <span class="led" id="led" aria-hidden="true"></span>
+          <button class="btn-power" data-key="power" data-hold="poweron" type="button" aria-label="Tænd/sluk">
+            <svg class="ico"><use href="#i-power" /></svg>
+          </button>
+          <span class="print">POWER</span>
+        </div>
       </header>
+
+      <div class="brand" aria-hidden="true">
+        <span class="brand-name">TELE&middot;KOMMANDO</span>
+        <span class="stripes"><i></i><i></i><i></i><i></i></span>
+        <span class="brand-model">MODEL 84</span>
+      </div>
 
       <div class="banner" id="banner" hidden></div>
 
       <main>
         <!-- FJERNBETJENING -->
         <section class="view" id="view-remote" data-view="remote">
-          <div class="vol-meter" id="volMeter" hidden>
-            <svg class="ico sm"><use href="#i-vol" /></svg>
-            <div class="vol-track"><div class="vol-fill" id="volFill"></div></div>
-            <span id="volText">–</span>
-          </div>
-
           <div class="quick-row">
             <button class="qbtn" data-action="source" type="button"><svg class="ico"><use href="#i-source" /></svg><span>Kilde</span></button>
             <button class="qbtn" data-key="mute" type="button"><svg class="ico"><use href="#i-mute" /></svg><span>Lydløs</span></button>
