@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="da">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+    <meta name="theme-color" content="#0f1012" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Fjernbetjening" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="description" content="Styr dit TV fra telefonen." />
+    <link rel="icon" href="./icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="./icon.svg" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="stylesheet" href="./style.css" />
+    <title>Fjernbetjening</title>
+  </head>
+  <body>
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+      <defs>
+        <symbol id="i-power" viewBox="0 0 24 24"><path d="M12 3v8M6.4 6.6a8 8 0 1 0 11.2 0" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+        <symbol id="i-mute" viewBox="0 0 24 24"><path d="M4 9.5h3.5L12 5v14l-4.5-4.5H4z" fill="currentColor"/><path d="M16 9.5l5 5m0-5l-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+        <symbol id="i-vol" viewBox="0 0 24 24"><path d="M4 9.5h3.5L12 5v14l-4.5-4.5H4z" fill="currentColor"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+        <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11l8-6.5 8 6.5M6.5 9.5V19h4v-5h3v5h4V9.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></symbol>
+        <symbol id="i-back" viewBox="0 0 24 24"><path d="M9 7L4.5 11.5 9 16M5 11.5h9.5a5 5 0 0 1 0 10H11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+        <symbol id="i-menu" viewBox="0 0 24 24"><path d="M5 7h14M5 12h14M5 17h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+        <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 11v5.5M12 7.6v.2" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+        <symbol id="i-guide" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3.5 9.5h17M9 9.5V19" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+        <symbol id="i-source" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 9v6m-3-3l3 3 3-3M8 20.5h8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+        <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2.8v2.6M12 18.6v2.6M21.2 12h-2.6M5.4 12H2.8M18.5 5.5l-1.8 1.8M7.3 16.7l-1.8 1.8M18.5 18.5l-1.8-1.8M7.3 7.3L5.5 5.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+        <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor"/></symbol>
+        <symbol id="i-playpause" viewBox="0 0 24 24"><path d="M4 6v12l8-6z" fill="currentColor"/><path d="M15 6.5v11M19.5 6.5v11" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></symbol>
+        <symbol id="i-stop" viewBox="0 0 24 24"><rect x="6.5" y="6.5" width="11" height="11" rx="1.5" fill="currentColor"/></symbol>
+        <symbol id="i-rew" viewBox="0 0 24 24"><path d="M11.5 6v12L3 12zM21 6v12l-8.5-6z" fill="currentColor"/></symbol>
+        <symbol id="i-ff" viewBox="0 0 24 24"><path d="M3 6v12l8.5-6zM12.5 6v12L21 12z" fill="currentColor"/></symbol>
+        <symbol id="i-rec" viewBox="0 0 24 24"><circle cx="12" cy="12" r="6" fill="currentColor"/></symbol>
+        <symbol id="i-sub" viewBox="0 0 24 24"><rect x="3" y="5.5" width="18" height="13" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M7 13.5h4M13 13.5h4M7 10h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+        <symbol id="i-list" viewBox="0 0 24 24"><path d="M9 7h11M9 12h11M9 17h11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="5" cy="7" r="1.3" fill="currentColor"/><circle cx="5" cy="12" r="1.3" fill="currentColor"/><circle cx="5" cy="17" r="1.3" fill="currentColor"/></symbol>
+        <symbol id="i-prev" viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.4-5.7M4 4.5v4h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+        <symbol id="i-exit" viewBox="0 0 24 24"><path d="M14 4.5h4.5v15H14M10 8l-4 4 4 4M6 12h9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+        <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6" fill="none" stroke="currentColor" stroke-width="2"/><path d="M15 15l5 5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+        <symbol id="i-remote" viewBox="0 0 24 24"><rect x="7" y="2.5" width="10" height="19" rx="3.5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="8" r="2" fill="currentColor"/><path d="M10 13h.01M14 13h.01M10 16.5h.01M14 16.5h.01" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></symbol>
+        <symbol id="i-apps" viewBox="0 0 24 24"><rect x="4" y="4" width="6.5" height="6.5" rx="1.8" fill="currentColor"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.8" fill="currentColor"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.8" fill="currentColor"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.8" fill="currentColor" opacity=".45"/></symbol>
+        <symbol id="i-keyboard" viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="12" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M6.5 10h.01M10 10h.01M14 10h.01M17.5 10h.01M8 14.2h8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+        <symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+        <symbol id="i-tv" viewBox="0 0 24 24"><rect x="2.5" y="4.5" width="19" height="12.5" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 20.5h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+        <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+        <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+        <symbol id="i-up" viewBox="0 0 24 24"><path d="M6 15l6-6 6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+        <symbol id="i-down" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+        <symbol id="i-left" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+        <symbol id="i-right" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+        <symbol id="i-trash" viewBox="0 0 24 24"><path d="M5 7h14M10 7V4.5h4V7M7 7l1 13h8l1-13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+        <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20l1-4.5L15.5 5l3.5 3.5L8.5 19z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+        <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3M19.5 4v4h-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+        <symbol id="i-moon" viewBox="0 0 24 24"><path d="M19.5 14.5A8 8 0 0 1 9.5 4.5a8 8 0 1 0 10 10z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+        <symbol id="i-touch" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="2.5" fill="currentColor"/></symbol>
+        <symbol id="i-dpad" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3" fill="currentColor"/></symbol>
+        <symbol id="i-send" viewBox="0 0 24 24"><path d="M4 12l16-7-6 15-2.5-6z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+        <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 3L5 13.5h6L10 21l8-10.5h-6z" fill="currentColor"/></symbol>
+        <symbol id="i-chev" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      </defs>
+    </svg>
+
+    <div class="app">
+      <header class="topbar">
+        <button class="tv-picker" id="tvPicker" type="button" aria-label="Vælg TV">
+          <span class="dot" id="statusDot"></span>
+          <span class="tv-picker-text">
+            <span class="tv-name" id="tvName">Intet TV</span>
+            <span class="tv-sub" id="tvSub">Tryk for at tilføje</span>
+          </span>
+          <svg class="ico sm"><use href="#i-chev" /></svg>
+        </button>
+        <button class="btn-power" data-key="power" data-hold="poweron" type="button" aria-label="Tænd/sluk">
+          <svg class="ico"><use href="#i-power" /></svg>
+        </button>
+      </header>
+
+      <div class="banner" id="banner" hidden></div>
+
+      <main>
+        <!-- FJERNBETJENING -->
+        <section class="view" id="view-remote" data-view="remote">
+          <div class="vol-meter" id="volMeter" hidden>
+            <svg class="ico sm"><use href="#i-vol" /></svg>
+            <div class="vol-track"><div class="vol-fill" id="volFill"></div></div>
+            <span id="volText">–</span>
+          </div>
+
+          <div class="quick-row">
+            <button class="qbtn" data-action="source" type="button"><svg class="ico"><use href="#i-source" /></svg><span>Kilde</span></button>
+            <button class="qbtn" data-key="mute" type="button"><svg class="ico"><use href="#i-mute" /></svg><span>Lydløs</span></button>
+            <button class="qbtn" data-key="guide" type="button"><svg class="ico"><use href="#i-guide" /></svg><span>Guide</span></button>
+            <button class="qbtn" data-key="settings" type="button"><svg class="ico"><use href="#i-gear" /></svg><span>Hurtigmenu</span></button>
+          </div>
+
+          <div class="nav-area">
+            <div class="seg" role="tablist" aria-label="Navigation">
+              <button class="seg-btn active" data-nav="dpad" type="button"><svg class="ico sm"><use href="#i-dpad" /></svg> Piletaster</button>
+              <button class="seg-btn" data-nav="touch" type="button"><svg class="ico sm"><use href="#i-touch" /></svg> Touchpad</button>
+            </div>
+
+            <div class="dpad" id="dpad">
+              <button class="dp up" data-key="up" data-repeat type="button" aria-label="Op"><svg class="ico"><use href="#i-up" /></svg></button>
+              <button class="dp right" data-key="right" data-repeat type="button" aria-label="Højre"><svg class="ico"><use href="#i-right" /></svg></button>
+              <button class="dp down" data-key="down" data-repeat type="button" aria-label="Ned"><svg class="ico"><use href="#i-down" /></svg></button>
+              <button class="dp left" data-key="left" data-repeat type="button" aria-label="Venstre"><svg class="ico"><use href="#i-left" /></svg></button>
+              <button class="dp ok" data-key="ok" type="button">OK</button>
+            </div>
+
+            <div class="touchpad" id="touchpad" hidden>
+              <div class="touch-hint" id="touchHint">Stryg for at navigere · Tryk for OK</div>
+              <div class="touch-ripple" id="touchRipple"></div>
+              <button class="touch-mode" id="mouseToggle" type="button" hidden>Musemarkør: fra</button>
+            </div>
+          </div>
+
+          <div class="row3">
+            <button class="rbtn" data-key="back" type="button"><svg class="ico"><use href="#i-back" /></svg><span>Tilbage</span></button>
+            <button class="rbtn" data-key="home" type="button"><svg class="ico"><use href="#i-home" /></svg><span>Hjem</span></button>
+            <button class="rbtn" data-key="menu" type="button"><svg class="ico"><use href="#i-menu" /></svg><span>Menu</span></button>
+          </div>
+
+          <div class="rockers">
+            <div class="rocker">
+              <button data-key="vol_up" data-repeat type="button" aria-label="Lydstyrke op"><svg class="ico"><use href="#i-plus" /></svg></button>
+              <span class="rocker-label">VOL</span>
+              <button data-key="vol_down" data-repeat type="button" aria-label="Lydstyrke ned"><svg class="ico"><use href="#i-minus" /></svg></button>
+            </div>
+            <div class="mid-col">
+              <button class="rbtn" data-key="info" type="button"><svg class="ico"><use href="#i-info" /></svg><span>Info</span></button>
+              <button class="rbtn" data-key="exit" type="button"><svg class="ico"><use href="#i-exit" /></svg><span>Afslut</span></button>
+            </div>
+            <div class="rocker">
+              <button data-key="ch_up" data-repeat type="button" aria-label="Kanal op"><svg class="ico"><use href="#i-up" /></svg></button>
+              <span class="rocker-label">KAN</span>
+              <button data-key="ch_down" data-repeat type="button" aria-label="Kanal ned"><svg class="ico"><use href="#i-down" /></svg></button>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="tabs" role="tablist">
+              <button class="tab active" data-panel="media" type="button">Afspil</button>
+              <button class="tab" data-panel="numpad" type="button">Tal</button>
+              <button class="tab" data-panel="colors" type="button">Farver</button>
+              <button class="tab" data-panel="channels" type="button">Kanaler</button>
+            </div>
+
+            <div class="panel-body" data-panel-body="media">
+              <div class="grid g3">
+                <button class="pbtn" data-key="rewind" data-repeat type="button" aria-label="Spol tilbage"><svg class="ico"><use href="#i-rew" /></svg></button>
+                <button class="pbtn primary" data-key="play_pause" type="button" aria-label="Afspil/pause"><svg class="ico"><use href="#i-playpause" /></svg></button>
+                <button class="pbtn" data-key="forward" data-repeat type="button" aria-label="Spol frem"><svg class="ico"><use href="#i-ff" /></svg></button>
+                <button class="pbtn" data-key="stop" type="button" aria-label="Stop"><svg class="ico"><use href="#i-stop" /></svg></button>
+                <button class="pbtn rec" data-key="record" type="button" aria-label="Optag"><svg class="ico"><use href="#i-rec" /></svg></button>
+                <button class="pbtn" data-key="subtitle" type="button" aria-label="Undertekster"><svg class="ico"><use href="#i-sub" /></svg></button>
+              </div>
+            </div>
+
+            <div class="panel-body" data-panel-body="numpad" hidden>
+              <div class="numpad-display" id="numDisplay">&nbsp;</div>
+              <div class="grid g3 numpad">
+                <button class="pbtn num" data-digit="1" type="button">1</button>
+                <button class="pbtn num" data-digit="2" type="button">2</button>
+                <button class="pbtn num" data-digit="3" type="button">3</button>
+                <button class="pbtn num" data-digit="4" type="button">4</button>
+                <button class="pbtn num" data-digit="5" type="button">5</button>
+                <button class="pbtn num" data-digit="6" type="button">6</button>
+                <button class="pbtn num" data-digit="7" type="button">7</button>
+                <button class="pbtn num" data-digit="8" type="button">8</button>
+                <button class="pbtn num" data-digit="9" type="button">9</button>
+                <button class="pbtn" data-key="ch_list" type="button" aria-label="Kanalliste"><svg class="ico"><use href="#i-list" /></svg></button>
+                <button class="pbtn num" data-digit="0" type="button">0</button>
+                <button class="pbtn" data-key="prev_ch" type="button" aria-label="Forrige kanal"><svg class="ico"><use href="#i-prev" /></svg></button>
+              </div>
+            </div>
+
+            <div class="panel-body" data-panel-body="colors" hidden>
+              <div class="grid g4">
+                <button class="pbtn color" data-key="red" style="--c:#e5484d" type="button" aria-label="Rød"></button>
+                <button class="pbtn color" data-key="green" style="--c:#30a46c" type="button" aria-label="Grøn"></button>
+                <button class="pbtn color" data-key="yellow" style="--c:#f5d90a" type="button" aria-label="Gul"></button>
+                <button class="pbtn color" data-key="blue" style="--c:#3e63dd" type="button" aria-label="Blå"></button>
+              </div>
+              <div class="grid g2" style="margin-top:10px">
+                <button class="pbtn wide" data-key="search" type="button"><svg class="ico sm"><use href="#i-search" /></svg> Søg</button>
+                <button class="pbtn wide" data-key="source" type="button"><svg class="ico sm"><use href="#i-source" /></svg> Kildeknap</button>
+              </div>
+            </div>
+
+            <div class="panel-body" data-panel-body="channels" hidden>
+              <div class="chips" id="favChips"></div>
+              <p class="muted small">Tilføj og ret favoritkanaler under Indstillinger.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- APPS & GENVEJE -->
+        <section class="view" id="view-apps" data-view="apps" hidden>
+          <h2 class="h">Apps</h2>
+          <div class="app-grid" id="appGrid"></div>
+
+          <div class="h-row">
+            <h2 class="h">Genveje</h2>
+            <button class="link" id="addMacro" type="button"><svg class="ico sm"><use href="#i-plus" /></svg> Ny genvej</button>
+          </div>
+          <div class="macro-list" id="macroList"></div>
+
+          <div class="h-row">
+            <h2 class="h">Alle apps på TV'et</h2>
+            <button class="link" id="loadApps" type="button"><svg class="ico sm"><use href="#i-refresh" /></svg> Hent</button>
+          </div>
+          <div class="list" id="tvApps"><div class="row"><span class="muted small">Tryk "Hent" for at se alle apps, der er installeret på TV'et.</span></div></div>
+        </section>
+
+        <!-- TEKST -->
+        <section class="view" id="view-text" data-view="text" hidden>
+          <h2 class="h">Skriv på TV'et</h2>
+          <p class="muted small">Åbn et søgefelt på TV'et, skriv her og send. Langt hurtigere end at taste med pilene.</p>
+          <div class="text-box">
+            <textarea id="textInput" rows="3" placeholder="Fx et filmnavn eller en Wi-Fi-kode…" autocomplete="off" autocapitalize="off" spellcheck="false"></textarea>
+            <button class="mic" id="micBtn" type="button" aria-label="Indtal tekst" hidden><svg class="ico"><use href="#i-mic" /></svg></button>
+          </div>
+          <div class="grid g2">
+            <button class="btn" id="sendText" type="button"><svg class="ico sm"><use href="#i-send" /></svg> Send</button>
+            <button class="btn primary" id="sendTextEnter" type="button"><svg class="ico sm"><use href="#i-search" /></svg> Send og søg</button>
+          </div>
+          <h3 class="h3">Seneste</h3>
+          <div class="chips" id="textHistory"></div>
+
+          <h3 class="h3">Hurtig navigation</h3>
+          <div class="grid g4">
+            <button class="pbtn" data-key="left" data-repeat type="button"><svg class="ico"><use href="#i-left" /></svg></button>
+            <button class="pbtn" data-key="up" data-repeat type="button"><svg class="ico"><use href="#i-up" /></svg></button>
+            <button class="pbtn" data-key="down" data-repeat type="button"><svg class="ico"><use href="#i-down" /></svg></button>
+            <button class="pbtn" data-key="right" data-repeat type="button"><svg class="ico"><use href="#i-right" /></svg></button>
+            <button class="pbtn" data-key="back" type="button"><svg class="ico"><use href="#i-back" /></svg></button>
+            <button class="pbtn primary" data-key="ok" type="button">OK</button>
+            <button class="pbtn" data-key="home" type="button"><svg class="ico"><use href="#i-home" /></svg></button>
+            <button class="pbtn" data-key="play_pause" type="button"><svg class="ico"><use href="#i-playpause" /></svg></button>
+          </div>
+        </section>
+
+        <!-- INDSTILLINGER -->
+        <section class="view" id="view-settings" data-view="settings" hidden>
+          <div class="h-row">
+            <h2 class="h">Mine TV'er</h2>
+            <button class="link" id="addTvBtn" type="button"><svg class="ico sm"><use href="#i-plus" /></svg> Tilføj TV</button>
+          </div>
+          <div class="list" id="tvList"></div>
+
+          <h2 class="h">Sleep-timer</h2>
+          <p class="muted small" id="sleepText">Slukker TV'et automatisk efter et valgt tidsrum.</p>
+          <div class="chips" id="sleepChips">
+            <button class="chip" data-sleep="15" type="button">15 min</button>
+            <button class="chip" data-sleep="30" type="button">30 min</button>
+            <button class="chip" data-sleep="45" type="button">45 min</button>
+            <button class="chip" data-sleep="60" type="button">1 time</button>
+            <button class="chip" data-sleep="90" type="button">1½ time</button>
+            <button class="chip" data-sleep="120" type="button">2 timer</button>
+            <button class="chip danger" data-sleep="0" type="button">Annullér</button>
+          </div>
+
+          <div class="h-row">
+            <h2 class="h">Favoritkanaler</h2>
+            <button class="link" id="addFav" type="button"><svg class="ico sm"><use href="#i-plus" /></svg> Tilføj</button>
+          </div>
+          <div class="list" id="favList"></div>
+
+          <h2 class="h">App</h2>
+          <div class="list">
+            <label class="row switch-row"><span>Vibration ved tryk</span><input type="checkbox" id="optHaptics" /></label>
+            <label class="row switch-row"><span>Gentag ved langt tryk (lyd, kanal, pile)</span><input type="checkbox" id="optRepeat" /></label>
+            <label class="row switch-row"><span>Tastaturgenveje (pile, Enter, Backspace, M, +/−)</span><input type="checkbox" id="optKeys" /></label>
+          </div>
+          <p class="muted small about">
+            Tip: Tilføj siden til hjemmeskærmen, så åbner den som en app.<br />
+            Langt tryk på tænd-knappen tænder TV'et via netværket (Wake-on-LAN).
+          </p>
+        </section>
+      </main>
+
+      <nav class="bottom-nav">
+        <button class="nav-btn active" data-goto="remote" type="button"><svg class="ico"><use href="#i-remote" /></svg><span>Fjernbetjening</span></button>
+        <button class="nav-btn" data-goto="apps" type="button"><svg class="ico"><use href="#i-apps" /></svg><span>Apps</span></button>
+        <button class="nav-btn" data-goto="text" type="button"><svg class="ico"><use href="#i-keyboard" /></svg><span>Tekst</span></button>
+        <button class="nav-btn" data-goto="settings" type="button"><svg class="ico"><use href="#i-gear" /></svg><span>Indstillinger</span></button>
+      </nav>
+    </div>
+
+    <div class="sheet-backdrop" id="sheetBackdrop" hidden></div>
+    <div class="sheet" id="sheet" role="dialog" aria-modal="true" hidden>
+      <div class="sheet-grip"></div>
+      <div class="sheet-content" id="sheetContent"></div>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>

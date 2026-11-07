@@ -1,0 +1,15 @@
+{
+  "name": "Fjernbetjening",
+  "short_name": "Fjernbetjening",
+  "description": "Styr dit TV fra telefonen.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0f1012",
+  "theme_color": "#0f1012",
+  "lang": "da",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

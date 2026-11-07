@@ -31,3 +31,7 @@ React 19 + TypeScript + Vite, ingen backend. Illustrationerne tegnes af en param
 Øvelserne ligger i `src/data/library/` – én fil pr. muskelgruppe. Hver øvelse har to positurer (`poses`), udstyr (`props`) og muskler (`muscles`), som styrer muskelkortet.
 
 Under udvikling viser `http://localhost:5173/gallery.html` alle øvelser med begge positurer side om side. Filtrér med `?squat,bench-press` og vælg antal kolonner med `#cols=2`.
+
+## Fjernbetjening til TV
+
+Mappen [`fjernbetjening/`](fjernbetjening/) indeholder en separat app, der gør telefonen til fjernbetjening for Samsung-, LG-, Sony- og Roku-TV'er. Se [fjernbetjening/README.md](fjernbetjening/README.md).
