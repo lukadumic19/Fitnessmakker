@@ -1507,3 +1507,339 @@ button.pressed:not(.dp):not(.btn-power):not(.rocker button) {
     transition: none !important;
   }
 }
+
+/* =========================================================
+   Realisme: materialer, lys, skygger og detaljer
+   Lyset kommer oppefra/venstre; alt kaster skygge ned/højre.
+   ========================================================= */
+
+:root {
+  /* Fin mat struktur (støj) til plastik og gummi */
+  --noise: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .07 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  --noise-dark: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .22 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  /* Træ-åretegning til bordet */
+  --wood: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='600'><filter id='w'><feTurbulence type='fractalNoise' baseFrequency='.004 .09' numOctaves='4' seed='7'/><feColorMatrix values='0 0 0 0 .32  0 0 0 0 .2  0 0 0 0 .11  0 0 0 -1.4 1.25'/></filter><rect width='100%25' height='100%25' fill='%23392519'/><rect width='100%25' height='100%25' filter='url(%23w)'/></svg>");
+}
+
+body {
+  background:
+    radial-gradient(ellipse 70% 55% at 50% 38%, rgba(255, 196, 140, 0.16), transparent 70%),
+    radial-gradient(ellipse at 50% 50%, transparent 40%, rgba(0, 0, 0, 0.55) 100%),
+    var(--wood) center / 600px 600px,
+    #2b1d14;
+  background-attachment: fixed;
+}
+
+/* Kabinet: buet overflade med lys på kanterne og kontaktskygge på bordet */
+.app {
+  background:
+    radial-gradient(ellipse 120% 40% at 30% 0%, rgba(255, 255, 255, 0.09), transparent 60%),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.35), transparent 7%, transparent 93%, rgba(0, 0, 0, 0.45)),
+    var(--noise),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.014) 0 1px, transparent 1px 4px),
+    linear-gradient(180deg, #3a3631, #2a2724 14%, #282522 85%, #1c1a18);
+  box-shadow:
+    inset 0 2px 1px rgba(255, 255, 255, 0.16),
+    inset 3px 0 3px rgba(255, 255, 255, 0.05),
+    inset -3px 0 4px rgba(0, 0, 0, 0.45),
+    inset 0 -6px 8px rgba(0, 0, 0, 0.5),
+    0 1px 0 #0b0a09,
+    0 3px 2px rgba(0, 0, 0, 0.7),
+    12px 26px 30px rgba(0, 0, 0, 0.55),
+    24px 60px 80px rgba(0, 0, 0, 0.45);
+  padding-top: 26px;
+}
+
+/* IR-vindue i toppen */
+.ir-window {
+  position: absolute;
+  top: 9px;
+  left: 50%;
+  width: 84px;
+  height: 9px;
+  transform: translateX(-50%);
+  border-radius: 5px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.28), transparent 45%),
+    radial-gradient(ellipse at 50% 80%, #6d1410, #2a0705 70%);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.8), 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* Bund: batterilåg-samling og skruer */
+.foot {
+  display: block;
+  position: relative;
+  height: 46px;
+  margin-top: 18px;
+}
+
+.seam {
+  position: absolute;
+  left: -16px;
+  right: -16px;
+  top: 8px;
+  height: 2px;
+  background: rgba(0, 0, 0, 0.6);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+@media (max-width: 472px) {
+  .seam {
+    left: -12px;
+    right: -12px;
+  }
+}
+
+.screws {
+  position: absolute;
+  inset: 22px 30px auto;
+  display: flex;
+  justify-content: space-between;
+}
+
+.screws i {
+  position: relative;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #d9d5cd, #8b867d 55%, #4b4740);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.35), 0 1px 0 rgba(255, 255, 255, 0.08), 0 0 0 3px rgba(0, 0, 0, 0.35);
+}
+
+.screws i::before,
+.screws i::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 8px;
+  height: 2px;
+  margin: -1px 0 0 -4px;
+  background: #3b3832;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.screws i::before {
+  transform: rotate(35deg);
+}
+
+.screws i::after {
+  transform: rotate(125deg);
+}
+
+/* LCD: glas, nedsænket i rammen, "spøgelsessegmenter" */
+.bezel {
+  background:
+    var(--noise),
+    linear-gradient(180deg, #0c0b0a, #1d1b19);
+  box-shadow:
+    inset 0 3px 6px rgba(0, 0, 0, 0.95),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.06),
+    0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.lcd {
+  background:
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.045) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.025) 0 1px, transparent 1px 3px),
+    radial-gradient(ellipse 90% 120% at 40% 10%, #c7d6a8, #a8b98b 55%, #8a9d70);
+  box-shadow: inset 0 3px 10px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(0, 0, 0, 0.35);
+}
+
+.lcd::after {
+  background:
+    linear-gradient(165deg, rgba(255, 255, 255, 0.32) 0%, rgba(255, 255, 255, 0.08) 28%, transparent 29%),
+    radial-gradient(ellipse at 100% 100%, rgba(0, 0, 0, 0.12), transparent 60%);
+}
+
+.tv-name,
+.tv-sub,
+.vol-meter {
+  text-shadow: 1.5px 1.5px 0 rgba(31, 42, 22, 0.16);
+}
+
+/* Gummiknapper: hvælvet top, mat struktur, spalte i kabinettet og slagskygge */
+.qbtn,
+.rbtn,
+.pbtn,
+.btn,
+.chip,
+.macro {
+  background:
+    radial-gradient(ellipse 90% 70% at 40% 0%, rgba(255, 255, 255, 0.13), transparent 70%),
+    var(--noise),
+    linear-gradient(180deg, var(--k), var(--kl));
+  box-shadow:
+    0 0 0 1.5px rgba(0, 0, 0, 0.55),
+    0 0 0 3px rgba(255, 255, 255, 0.025),
+    0 3px 0 var(--ke),
+    3px 6px 7px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -3px 4px rgba(0, 0, 0, 0.25);
+}
+
+.qbtn:active,
+.rbtn:active,
+.pbtn:active,
+.btn:active,
+.chip:active,
+.macro:active,
+button.pressed:not(.dp):not(.btn-power):not(.rocker button) {
+  transform: translateY(2.5px);
+  filter: brightness(0.93);
+  box-shadow:
+    0 0 0 1.5px rgba(0, 0, 0, 0.6),
+    0 0.5px 0 var(--ke),
+    1px 1px 2px rgba(0, 0, 0, 0.55),
+    inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Silketryk: tekst trykt på knapperne er let slidt og mat */
+.qbtn span,
+.rbtn span,
+.pbtn,
+.print,
+.rocker-label,
+.brand {
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.35);
+}
+
+.qbtn .ico,
+.rbtn .ico,
+.pbtn .ico,
+.rocker .ico,
+.dp .ico {
+  filter: drop-shadow(0 -1px 0 rgba(0, 0, 0, 0.45));
+}
+
+/* Beige taltaster: varm, let gulnet plastik */
+.pbtn.num {
+  background:
+    radial-gradient(ellipse 90% 70% at 40% 0%, rgba(255, 255, 255, 0.4), transparent 70%),
+    var(--noise-dark),
+    linear-gradient(180deg, #ece0c3, #d2c4a3);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+/* Lyd/kanal-vippere */
+.rocker {
+  background:
+    radial-gradient(ellipse 80% 30% at 40% 0%, rgba(255, 255, 255, 0.14), transparent 70%),
+    var(--noise),
+    linear-gradient(90deg, var(--kl), var(--k) 30%, var(--k) 70%, var(--kl));
+  box-shadow:
+    0 0 0 1.5px rgba(0, 0, 0, 0.6),
+    0 4px 0 var(--ke),
+    4px 8px 10px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16);
+}
+
+/* Tænd/sluk: blank rød plast med refleks */
+.btn-power {
+  background:
+    radial-gradient(ellipse 50% 30% at 38% 22%, rgba(255, 255, 255, 0.55), transparent 70%),
+    radial-gradient(circle at 40% 35%, #e95244, #c2302a 55%, #7f1a14);
+  box-shadow:
+    0 0 0 2px rgba(0, 0, 0, 0.55),
+    0 4px 0 #4f100b,
+    4px 9px 12px rgba(0, 0, 0, 0.55),
+    inset 0 -3px 5px rgba(0, 0, 0, 0.3);
+}
+
+/* Piletaster: børstet krom-ring (koncentriske riller) + gummikryds */
+.dpad {
+  background:
+    radial-gradient(ellipse 60% 30% at 35% 18%, rgba(255, 255, 255, 0.55), transparent 70%),
+    repeating-radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.08) 0 1px, rgba(0, 0, 0, 0.06) 1px 2px),
+    conic-gradient(from 210deg, #f4f1eb, #8c877e 18%, #d8d3ca 32%, #6e6961 50%, #e9e5de 66%, #8a857c 82%, #f4f1eb);
+  box-shadow:
+    0 0 0 2px rgba(0, 0, 0, 0.6),
+    0 5px 0 #11100f,
+    6px 12px 18px rgba(0, 0, 0, 0.6),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+}
+
+.dpad::before {
+  background:
+    radial-gradient(ellipse 80% 50% at 40% 10%, rgba(255, 255, 255, 0.1), transparent 70%),
+    var(--noise),
+    radial-gradient(circle at 50% 40%, #4a4641, #2b2825 72%);
+  box-shadow:
+    inset 0 4px 8px rgba(0, 0, 0, 0.7),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.1),
+    0 0 0 1px rgba(0, 0, 0, 0.5);
+}
+
+.dp.ok {
+  background:
+    radial-gradient(ellipse 50% 30% at 40% 22%, rgba(255, 255, 255, 0.5), transparent 70%),
+    var(--noise),
+    radial-gradient(circle at 45% 35%, #ff9a4d, #f2761c 55%, #b44b0c);
+  box-shadow:
+    0 0 0 2px rgba(0, 0, 0, 0.55),
+    0 4px 0 #6c2c06,
+    4px 8px 12px rgba(0, 0, 0, 0.6),
+    inset 0 -3px 5px rgba(0, 0, 0, 0.25);
+}
+
+/* Nedsænkede felter i kabinettet */
+.nav-area,
+.panel {
+  background:
+    var(--noise),
+    linear-gradient(180deg, #1c1a18, #24221f);
+  box-shadow:
+    inset 0 4px 10px rgba(0, 0, 0, 0.8),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.05),
+    0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+/* Billedrør: buet glas med refleks og vignet */
+.touchpad {
+  background:
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.25) 0 1px, transparent 1px 3px),
+    radial-gradient(ellipse 75% 70% at 50% 45%, #22432b, #0f1f13 60%, #050906);
+}
+
+.touchpad::after {
+  background:
+    radial-gradient(ellipse 60% 35% at 30% 12%, rgba(255, 255, 255, 0.13), transparent 70%),
+    radial-gradient(ellipse at 50% 50%, transparent 55%, rgba(0, 0, 0, 0.55) 100%);
+}
+
+/* App-knapper i farvet plastik */
+.app-tile {
+  background:
+    radial-gradient(ellipse 90% 60% at 35% 0%, rgba(255, 255, 255, 0.3), transparent 70%),
+    var(--noise),
+    linear-gradient(180deg, var(--k), var(--kl));
+  box-shadow:
+    0 0 0 1.5px rgba(0, 0, 0, 0.55),
+    0 4px 0 var(--ke),
+    4px 8px 10px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    inset 0 -4px 6px rgba(0, 0, 0, 0.25);
+}
+
+/* Metallisten i bunden: børstet aluminium */
+.bottom-nav {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.35), transparent 30%),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.07) 0 1px, rgba(0, 0, 0, 0.04) 1px 2px, transparent 2px 4px),
+    var(--noise-dark),
+    linear-gradient(180deg, #c4bfb5, #8e8980);
+}
+
+/* Mærkeskilt i trykt metal-look */
+.brand-name {
+  background: linear-gradient(180deg, #fff6e2, #c9b892);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: none;
+  filter: drop-shadow(0 -1px 0 rgba(0, 0, 0, 0.5));
+}
+
+.stripes i {
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
